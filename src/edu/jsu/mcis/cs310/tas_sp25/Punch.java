@@ -8,26 +8,26 @@ public class Punch{
     
    // Declaring variables to required for the class
    private int id;
-   private int terminalid;
+   private int terminalId;
    private Badge badge;
    private EventType punchType;
    private LocalDateTime originalTimeStamp;
    private LocalDateTime adjustedTimeStamp;
    
    // First Constructor
-   public Punch(int terminalid, Badge badge, EventType punchtype){
-       this.terminalid = terminalid;
+   public Punch(int terminalId, Badge badge, EventType punchType){
+       this.terminalId = terminalId;
        this.badge = badge;
-       this.punchType = punchtype;
+       this.punchType = punchType;
        this.originalTimeStamp = LocalDateTime.now();
    }
    
    // Second Constructor
-   public Punch(int id, int terminalid, Badge badge, LocalDateTime originaltimestamp, EventType punchtype){
+   public Punch(int id, int terminalId, Badge badge, LocalDateTime originaltimestamp, EventType punchType){
        this.id = id;
-       this.terminalid = terminalid;
+       this.terminalId = terminalId;
        this.badge = badge;
-       this.punchType = punchtype;
+       this.punchType = punchType;
        this.originalTimeStamp = originaltimestamp;
    }
 
@@ -36,8 +36,8 @@ public class Punch{
         return id;
     }
 
-    public int getTerminalid() {
-        return terminalid;
+    public int getTerminalId() {
+        return terminalId;
     }
 
     public Badge getBadge() {
