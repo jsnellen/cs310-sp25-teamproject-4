@@ -69,7 +69,7 @@ public class EmployeeDAO {
         return employee;
     }
     
-    public Employee find(Badge bage){
+    public Employee find(Badge badge){
         if (badge == null) return null;
         
         String query = "SELECT id FROM employee WHERE badgeid = ?";
