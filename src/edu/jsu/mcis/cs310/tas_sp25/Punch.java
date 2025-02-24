@@ -1,8 +1,12 @@
-// @author Evan Ranjitkar
+/**
+ *
+ * @author evanranjitkar
+ */
 
 package edu.jsu.mcis.cs310.tas_sp25;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Punch{
     
@@ -10,24 +14,24 @@ public class Punch{
    private int id;
    private int terminalId;
    private Badge badge;
-   private EventType punchType;
+   private EventType eventType;
    private LocalDateTime originalTimeStamp;
    private LocalDateTime adjustedTimeStamp;
    
    // First Constructor
-   public Punch(int terminalId, Badge badge, EventType punchType){
+   public Punch(int terminalId, Badge badge, EventType eventType){
        this.terminalId = terminalId;
        this.badge = badge;
-       this.punchType = punchType;
+       this.eventType = eventType;
        this.originalTimeStamp = LocalDateTime.now();
    }
    
    // Second Constructor
-   public Punch(int id, int terminalId, Badge badge, LocalDateTime originaltimestamp, EventType punchType){
+   public Punch(int id, int terminalId, Badge badge, LocalDateTime originaltimestamp, EventType eventType){
        this.id = id;
        this.terminalId = terminalId;
        this.badge = badge;
-       this.punchType = punchType;
+       this.eventType = eventType;
        this.originalTimeStamp = originaltimestamp;
    }
 
@@ -44,8 +48,8 @@ public class Punch{
         return badge;
     }
 
-    public EventType getPunchType() {
-        return punchType;
+    public EventType getEventType() {
+        return eventType;
     }
 
     public LocalDateTime getOriginalTimeStamp() {
@@ -58,8 +62,22 @@ public class Punch{
     
     // Print methods
     
-    public void printOriginal(){
-       System.out.println("TERMINAL ID: " + this.getId() + "\nBADGE: " + this.getBadge() + "PUNCH TYPE: " + this.getPunchType());
+    public String printOriginal(){
+        
+        // The pringOriginal method shoud return a String in the following format
+        //"#badgeid "eventtype" : time stamp in uppercase"
+        DateTimeFormatter timeStampFormat = DateTimeFormatter.ofPattern("EEE MM/dd/uuuu HH:mm:ss");
+         
+        // Using Stringbuilder for string concatenation
+        StringBuilder stringBuilderResult = new StringBuilder();
+        
+        // Using the append method to concat the badgeId, eventType, and timeStamp
+        stringBuilderResult.append("#").append(badge.getId()).append(" ")
+            .append(eventType.toString()).append(": ")
+            .append(originalTimeStamp.format(timeStampFormat).toUpperCase());
+
+        // Returning the formatted string
+        return stringBuilderResult.toString(); 
     }
    
     public void printAdjusted(){
