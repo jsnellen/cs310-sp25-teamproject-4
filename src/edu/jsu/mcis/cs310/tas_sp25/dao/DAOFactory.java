@@ -50,4 +50,7 @@ public final class DAOFactory {
         return new DepartmentDAO(this);
     }
 
+    public ShiftDAO getShiftDAO(){
+        return new ShiftDAO(this);
+    }
 }

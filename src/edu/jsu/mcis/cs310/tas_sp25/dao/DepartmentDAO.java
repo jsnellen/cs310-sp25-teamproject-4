@@ -17,13 +17,24 @@ import java.sql.SQLException;
  */
 public class DepartmentDAO {
     
+    // SQL query to fetch a department based on its ID
     private static final String QUERY_FIND = "SELECT * FROM department WHERE id = ?";
+    // DAOFactory instance to get database connections
     private final DAOFactory daoFactory;
 
+    /**
+    * Constructor for DepartmentDAO
+     * @param daoFactory The factory that provides access to the database connection
+    */
     public DepartmentDAO(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
-
+   
+    /**
+    * Retrieves a department from the database using its ID.
+    * @param id The unique identifier of the department to find.
+    * @return A Department object if found, otherwise null.
+    */
     public Department find(int id) {
         Department department = null;
 
