@@ -70,6 +70,7 @@ public class EmployeeDAO {
     }
     
     public Employee find(Badge badge){
+        
         if (badge == null) return null;
         
         String query = "SELECT id FROM employee WHERE badgeid = ?";

@@ -44,7 +44,7 @@ public class PunchCreateTest {
         
         int punchid = punchDAO.create(p1);
         
-        System.out.println(punchid);
+        System.out.println("Punch id: " + punchid);
 
         /* Retrieve New Punch */
         

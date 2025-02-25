@@ -5,6 +5,8 @@
 package edu.jsu.mcis.cs310.tas_sp25.dao;
 
 import edu.jsu.mcis.cs310.tas_sp25.Badge;
+import edu.jsu.mcis.cs310.tas_sp25.Department;
+import edu.jsu.mcis.cs310.tas_sp25.Employee;
 import edu.jsu.mcis.cs310.tas_sp25.EventType;
 import edu.jsu.mcis.cs310.tas_sp25.Punch;
 import java.sql.Connection;
@@ -112,16 +114,8 @@ public class PunchDAO {
     }
     
     public int create(Punch punchObject){
-        
-        // Getting the terminalid from the punchObeject and 
-        // storing it in an int variable
-        int terminalId = punchObject.getTerminalId();
-        
-        int departmentId = 0;
-        
-        int resultId = 0;
        
-        // Authorization Incomplete
+        int resultId = 0;
         
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -130,13 +124,27 @@ public class PunchDAO {
             
             Connection conn = daoFactory.getConnection();
             
+            // Getting the terminalid from the punchObeject and 
+            // storing it in an int variable
+            int terminalId = punchObject.getTerminalId(); 
+            
+            
             if (conn.isValid(0)) {
 
                 //Creating the query as a PreparedStatement
                 ps = conn.prepareStatement(Query_INSERT, Statement.RETURN_GENERATED_KEYS);
                 
+                System.out.println("Before Employee");
+             
+                EmployeeDAO employeeDAO = daoFactory.getEmployeeDAO();
+                Employee employee = employeeDAO.find(Integer.parseInt(punchObject.getBadge().getId()));
+
+               
+            
+                System.out.println("EMPLOYEE IS FULL");
+                
                 // Providing the arguments for the PreparedStatement
-                ps.setInt(1, punchObject.getTerminalId());
+                ps.setInt(1, terminalId);
                 ps.setString(2, punchObject.getBadge().getId());
                 ps.setTimestamp(3, Timestamp.valueOf(punchObject.getOriginalTimeStamp()));
                 ps.setInt(4, punchObject.getEventType().ordinal());
