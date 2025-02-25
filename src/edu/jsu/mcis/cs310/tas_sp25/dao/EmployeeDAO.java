@@ -2,7 +2,11 @@ package edu.jsu.mcis.cs310.tas_sp25.dao;
 import edu.jsu.mcis.cs310.tas_sp25.*;
 import java.sql.*;
 import java.time.LocalDateTime;
-
+import edu.jsu.mcis.cs310.tas_sp25.Shift;
+import edu.jsu.mcis.cs310.tas_sp25.Department;
+import edu.jsu.mcis.cs310.tas_sp25.Badge;
+import edu.jsu.mcis.cs310.tas_sp25.EmployeeType;
+import edu.jsu.mcis.cs310.tas_sp25.Employee;
 
 /**
  *
@@ -33,8 +37,11 @@ public class EmployeeDAO {
                 // Extract employee data from database
                 String firstname = rs.getString("firstname");
                 String middlename = rs.getString("middlename");
+                if (middlename == null){
+                    middlename = "";
+                }
                 String lastname = rs.getString("lastname");
-                LocalDateTime active = rs.getTimeStamp("active").toLocalDateTime();
+                LocalDateTime active = rs.getTimestamp("active").toLocalDateTime();
                 String badgeId = rs.getString("badgeid");
                 int departmentId = rs.getInt("departmentid");
                 int shiftId = rs.getInt("shiftid");
@@ -46,18 +53,14 @@ public class EmployeeDAO {
                 ShiftDAO shiftDAO = daoFactory.getShiftDAO();
                 Badge badge = badgeDAO.find(badgeId);
                 Department department = departmentDAO.find(departmentId);
+
                 Shift shift = shiftDAO.find(shiftId);
                 
-                // Checking the employee type, Prevents invalid values   
-                EmployeeType employeeType;
-                if (typeId == 1){
-                    employeeType = EmployeeType.PART_TIME;
-                } else {
-                    employeeType = EmployeeType.FULL_TIME;
-                }
-                
+                // Checking the employee type  
+                EmployeeType employeeType = (typeId == 0) ? EmployeeType.PART_TIME : EmployeeType.FULL_TIME;
+                             
                 // Ensures that all dependent objects are valid before creating Employee, if they are null nothing happens
-                if (badge != null && department != null && shift != null){
+                if (badge != null && department != null){
                     employee = new Employee(id, firstname, middlename, lastname, active, badge, department, shift, employeeType);
                 }
                 
