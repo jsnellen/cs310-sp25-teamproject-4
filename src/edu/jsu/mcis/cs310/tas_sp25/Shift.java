@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  *
  * @author denzel
- * 
+ * @author mahin
  */
 public class Shift {
     
