@@ -53,17 +53,14 @@ public class EmployeeDAO {
                 ShiftDAO shiftDAO = daoFactory.getShiftDAO();
                 Badge badge = badgeDAO.find(badgeId);
                 Department department = departmentDAO.find(departmentId);
+
                 Shift shift = shiftDAO.find(shiftId);
-                System.out.println("Badge: " + badge);
-                System.out.println("Department: " + department);
-                System.out.println("Shift: " + shift);
                 
-                
-                // Checking the employee type, Prevents invalid values   
+                // Checking the employee type  
                 EmployeeType employeeType = (typeId == 0) ? EmployeeType.PART_TIME : EmployeeType.FULL_TIME;
-                
+                             
                 // Ensures that all dependent objects are valid before creating Employee, if they are null nothing happens
-                if (badge != null && department != null && shift != null){
+                if (badge != null && department != null){
                     employee = new Employee(id, firstname, middlename, lastname, active, badge, department, shift, employeeType);
                 }
                 
