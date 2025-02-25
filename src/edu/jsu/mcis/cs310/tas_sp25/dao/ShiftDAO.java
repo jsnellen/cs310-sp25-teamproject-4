@@ -12,7 +12,7 @@ import java.util.*;
  *The ShiftDAO class provides data access methods for interacting with the shift table in the database.
  * It allows retrieving shift information based on shift ID or employee badge ID.
  * 
- * @author denze
+ * @author denzel
  */
 public class ShiftDAO {
     
