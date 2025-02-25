@@ -16,7 +16,7 @@ public class ShiftDAO {
     
     private final DAOFactory daoFactory;
     
-    ShiftDAO(DAOFactory daoFactory) {
+    public ShiftDAO(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
     
