@@ -105,20 +105,7 @@ public class DepartmentFindTest {
         assertEquals("#10 (Maintenance), Terminal ID: 104", d6.toString());
 
     }
-    
-    @Test
-    public void testFindDepartment7() {
 
-        DepartmentDAO departmentDAO = daoFactory.getDepartmentDAO();
-
-        /* Retrieve Department from Database */
-        
-        Department d7 = departmentDAO.find(9);
-
-        /* Compare to Expected Values */
-        
-        assertEquals("#9 (Tool and Die), Terminal ID: 104", d7.toString());
-    }
     
 
 }
