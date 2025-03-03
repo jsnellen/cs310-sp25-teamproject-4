@@ -2,11 +2,10 @@ package edu.jsu.mcis.cs310.tas_sp25;
 
 
 import static java.lang.Math.abs;
-import java.lang.reflect.Array;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
-import java.util.Map;
+import java.time.Duration;
 
 /**
  *
@@ -15,104 +14,103 @@ import java.util.Map;
  */
 public class Shift {
     
-    private int shiftid;
-    private String desc;
-    private LocalTime shiftstart;
-    private LocalTime shiftstop;
-    private int roundInterval;
-    private int gracePeriod;
-    private int dockPenalty;
-    private LocalTime lunchstart;
-    private LocalTime lunchstop;
-    private int lunchThreshold;
+    private int shift_id;
+    private int round_Interval;
+    private int grace_Period;
+    private int dock_Penalty;
+    private int lunch_Threshold;
+    private String description;
+    private LocalTime shift_Start;
+    private LocalTime shift_Stop;
+    private LocalTime lunch_Start;
+    private LocalTime lunch_Stop;
     
     public Shift(HashMap<String, Object> theMap) {
         
-        shiftid = (Integer)theMap.get("shiftid");
-        roundInterval = (Integer)theMap.get("roundinterval");
-        gracePeriod = (Integer)theMap.get("graceperiod");
-        dockPenalty = (Integer)theMap.get("dockpenalty");
-        lunchThreshold = (Integer)theMap.get("lunchthreshold");
-        
-        desc = (String)theMap.get("description");
-        
-        lunchstart = (LocalTime)theMap.get("lunchstart");
-        lunchstop = (LocalTime)theMap.get("lunchstop");
-        
-        shiftstart = (LocalTime)theMap.get("shiftstart");
-        shiftstop = (LocalTime)theMap.get("shiftstop");
+        shift_id = (Integer)theMap.get("shiftid");
+        round_Interval = (Integer)theMap.get("roundinterval");
+        grace_Period = (Integer)theMap.get("graceperiod");
+        dock_Penalty = (Integer)theMap.get("dockpenalty");
+        lunch_Threshold = (Integer)theMap.get("lunchthreshold");    
+        description = (String)theMap.get("description");     
+        lunch_Start = (LocalTime)theMap.get("lunchstart");
+        lunch_Stop = (LocalTime)theMap.get("lunchstop");    
+        shift_Start = (LocalTime)theMap.get("shiftstart");
+        shift_Stop = (LocalTime)theMap.get("shiftstop");
         
     }
+    
 
     public int getShiftid() {
-        return shiftid;
+        return shift_id;
     }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public LocalTime getShiftstart() {
-        return shiftstart;
-    }
-
-    public LocalTime getShiftstop() {
-        return shiftstop;
-    }
-
+    
     public int getRoundInterval() {
-        return roundInterval;
+        return round_Interval;
     }
-
+    
     public int getGracePeriod() {
-        return gracePeriod;
+        return grace_Period;
     }
 
     public int getDockPenalty() {
-        return dockPenalty;
+        return dock_Penalty;
+    }
+    
+    public int getLunchThreshold() {
+        return lunch_Threshold;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public LocalTime getShiftstart() {
+        return shift_Start;
+    }
+
+    public LocalTime getShiftstop() {
+        return shift_Stop;
     }
 
     public LocalTime getLunchstart() {
-        return lunchstart;
+        return lunch_Start;
     }
 
     public LocalTime getLunchstop() {
-        return lunchstop;
-    }
-
-    public int getLunchThreshold() {
-        return lunchThreshold;
+        return lunch_Stop;
     }
 
     
     
     public int getShiftDuration() {
         
-        if (shiftstart.isBefore(shiftstop)) {
-            return (int)(ChronoUnit.MINUTES.between(shiftstart, shiftstop));
+        long minutesInDay = Duration.ofDays(1).toMinutes();
+        if (shift_Start.isBefore(shift_Stop)) {
+            return (int)(ChronoUnit.MINUTES.between(shift_Start, shift_Stop));
         }
         else {
-            return 1440 - (int)(ChronoUnit.MINUTES.between(shiftstop, shiftstart));
+            return (int)(minutesInDay - ChronoUnit.MINUTES.between(shift_Stop, shift_Start));
         }
         
     }
     
     public int getLunchDuration() {
         
-        return abs((int)(ChronoUnit.MINUTES.between(lunchstart, lunchstop)));
+        return abs((int)(ChronoUnit.MINUTES.between(lunch_Start, lunch_Stop)));
     
     }
   
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
-        s.append(this.getDesc()).append(": ").append(this.getShiftstart())
+        StringBuilder hello = new StringBuilder();
+        hello.append(this.getDescription()).append(": ").append(this.getShiftstart())
         .append(" - ").append(this.getShiftstop()).append(" (").append(this.getShiftDuration())
         .append(" minutes); Lunch: ").append(this.getLunchstart()).append(" - ")
         .append(this.getLunchstop()).append(" (").append(this.getLunchDuration()).append(" minutes)");
         
-        String totalStr = s.toString();
+        String totalStr = hello.toString();
         
         return totalStr;
     }
