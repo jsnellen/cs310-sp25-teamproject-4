@@ -15,7 +15,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 /**
  *
@@ -26,6 +28,8 @@ public class PunchDAO {
     // Writing queries to pass into prepareStatement
     private static final String Query_INSERT = "INSERT INTO event (terminalid, badgeid, timestamp, eventtypeid) VALUES (?,?,?,?);";
     private static final String Query_FIND = "SELECT * FROM event WHERE id = ?";
+    private static final String Query_PUNCH_FIND = "SELECT * FROM event WHERE badgeid = ? and timestamp = ?";
+    
     
     public final DAOFactory daoFactory;
     
@@ -130,9 +134,6 @@ public class PunchDAO {
             // Getting the terminalid from the punchObeject and 
             // storing it in an int variable
             int terminalId = punchObject.getTerminalId(); 
-          
-            
-            System.out.println("Connection is connected? " + conn.isValid(0));
             
             if (conn.isValid(0)) {
                 
@@ -206,5 +207,65 @@ public class PunchDAO {
         // Returning the resultId or the numeric id of the newly-inserted punch
         return resultId;
         
+    }
+    
+    
+    // Should return an ArrayList of Punch objects
+    // Should take Badge object and LocalDate as arguments
+    
+    public ArrayList<Punch> list(Badge badge, LocalDate date){
+        
+        // Initializing an ArrayList to store the results
+        ArrayList<Punch> punchList = new ArrayList<>();
+        
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        
+        try {
+            
+            Connection conn = daoFactory.getConnection();
+            
+            if (conn.isValid(0)) {
+                
+                //Creating the query as a PreparedStatement
+                ps = conn.prepareStatement(Query_PUNCH_FIND);
+                
+                // Providing the arguments for the PreparedStatement
+                ps.setString(1, badge.getId());
+                
+                // Converting LocalDate to Date
+                ps.setDate(2, java.sql.Date.valueOf(date));
+                
+                // Executing the PreparedStatement
+                boolean hasResults = ps.execute();
+                
+                // If query has results, then retrieving the data
+                if (hasResults){
+                    
+                    // Getting result set and storing it in the ResultSet variable
+                    rs = ps.getResultSet();
+                    
+                    // while loop to loop through the result set
+                    while(rs.next()){
+                        
+                       
+                    }
+                    
+                }
+                
+            }
+        } 
+        catch (Exception e) { e.printStackTrace(); }
+        
+        finally {
+            
+            if (rs != null) { try { rs.close(); } catch (Exception e) { e.printStackTrace(); } }
+            if (ps != null) { try { ps.close(); } catch (Exception e) { e.printStackTrace(); } }
+            
+        }
+        
+        // Returning the ArrayList
+        return punchList;
     }
 }
