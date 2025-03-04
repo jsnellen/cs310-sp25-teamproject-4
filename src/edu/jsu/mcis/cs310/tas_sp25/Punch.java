@@ -1,11 +1,13 @@
 /**
  *
  * @author evanranjitkar
+ * @author Tanner Thomas
  */
 
 package edu.jsu.mcis.cs310.tas_sp25;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class Punch{
@@ -17,6 +19,7 @@ public class Punch{
    private EventType eventType;
    private LocalDateTime originalTimeStamp;
    private LocalDateTime adjustedTimeStamp;
+   private PunchAdjustmentType adjustmentType;
    
    // First Constructor
    public Punch(int terminalId, Badge badge, EventType eventType){
@@ -58,6 +61,35 @@ public class Punch{
 
     public LocalDateTime getAdjustedTimeStamp() {
         return adjustedTimeStamp;
+    }
+    
+    public void adjust (Shift s) {
+        // Store the original timestamp for the punch
+        LocalDateTime original = this.originalTimeStamp;
+        // Start with no adjustment
+        LocalDateTime adjusted = original;
+        // Default adjustment is NONE
+        PunchAdjustmentType adjustmentType = PunchAdjustmentType.NONE;
+        
+        // Shift Parameters
+        LocalTime shiftStart = s.getShiftStart();
+        LocalTime shiftStop = s.getShiftStop();
+        LocalTime lunchStart = s.getLunchStart();
+        LocalTime lunchStop = s.getLunchStop();
+        int roundInterval = s.getRoundInterval();
+        int gracePeriod = s.getGracePeriod();
+        int dockPenalty = s.getDockPenalty();
+        
+        // Converting timestamps to LocalTime
+        LocalTime punchTime = original.toLocalTime();
+        DayOfWeek day = original.getDayOfWeek();
+        
+        // Skipping adjustments for Time out punches
+        if (eventType == EventType.TIME_OUT) {
+            this.adjustedTimeStamp = original;
+            this.adjustmentType = PunchAdjustmentType.NONE;
+        }
+        
     }
     
     // Print methods
