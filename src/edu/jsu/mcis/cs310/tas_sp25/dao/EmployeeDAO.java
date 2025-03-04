@@ -26,8 +26,9 @@ public class EmployeeDAO {
         // SQL query to find an Employee by ID 
         String query = "Select * FROM employee WHERE id = ?";
         
+        Connection conn = daoFactory.getConnection();
         
-        try(Connection conn = daoFactory.getConnection();
+        try(
         PreparedStatement pst = conn.prepareStatement(query)){
             
             pst.setInt(1, id);
@@ -79,7 +80,9 @@ public class EmployeeDAO {
         String query = "SELECT id FROM employee WHERE badgeid = ?";
         Employee employee = null;
         
-        try(Connection conn = daoFactory.getConnection();
+        Connection conn = daoFactory.getConnection();
+        
+        try(
         PreparedStatement pst = conn.prepareStatement(query)){
             
             pst.setString(1, badge.getId());
@@ -87,7 +90,7 @@ public class EmployeeDAO {
             
             if (rs.next()){
                 int id = rs.getInt("id");
-                employee = find(id);
+                employee = this.find(id);
             }
             
         } catch (SQLException e){
@@ -95,4 +98,6 @@ public class EmployeeDAO {
         }
         return employee;
     }
+    
+  
 }

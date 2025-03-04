@@ -49,11 +49,11 @@ public class PunchCreateTest {
         /* Retrieve New Punch */
         
         Punch p2 = punchDAO.find(punchid);
-        
-        System.out.println(punchDAO.find(punchid));
-        System.out.println(p2);
 
         /* Compare Punches */
+        
+        System.out.println("Expected : " + badgeid + terminalid + punchtype + ots.format(dtf));
+        System.out.println("Actual   : " + p2.getBadge().getId() + p2.getTerminalId() + p2.getEventType() + ots.format(dtf));
         
         assertEquals(badgeid, p2.getBadge().getId());
 

@@ -38,7 +38,8 @@ public class DepartmentDAO {
     public Department find(int id) {
         Department department = null;
 
-        try (Connection conn = daoFactory.getConnection();
+        Connection conn = daoFactory.getConnection();
+        try (
              PreparedStatement ps = conn.prepareStatement(QUERY_FIND)) {
 
             ps.setInt(1, id);

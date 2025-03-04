@@ -117,8 +117,11 @@ public class PunchDAO {
        
         int resultId = 0;
         
+        int departmentTerminalId;
+        
         PreparedStatement ps = null;
         ResultSet rs = null;
+        
         
         try {
             
@@ -127,33 +130,52 @@ public class PunchDAO {
             // Getting the terminalid from the punchObeject and 
             // storing it in an int variable
             int terminalId = punchObject.getTerminalId(); 
+          
             
+            System.out.println("Connection is connected? " + conn.isValid(0));
             
             if (conn.isValid(0)) {
+                
+                // Getting the EmployeeDAO from daoFactory
+                
+                EmployeeDAO employeeDAO = daoFactory.getEmployeeDAO();
+                
+                // Using the find method in EmployeeDAO to find the employee object with the same badge as the punch
+                
+                Employee employee = employeeDAO.find(punchObject.getBadge());
 
+                // Creating a Department object and initializing it to the employees department
+                Department employeeDepartment = employee.getDepartment();
+
+                // Getting the Department's terminal id
+                departmentTerminalId = employeeDepartment.getTerminalId();
+                
+                // Checking if the terminalId id of the punch matches the department terminal id
+                // and if the departmentTerminalId is 0
+                // If neither of these condition satisfies, then the punch is unauthorized
+                if(departmentTerminalId != terminalId && departmentTerminalId != 0 ){
+                    
+                   return 0;
+                   
+                }
+                
                 //Creating the query as a PreparedStatement
                 ps = conn.prepareStatement(Query_INSERT, Statement.RETURN_GENERATED_KEYS);
                 
-                System.out.println("Before Employee");
-             
-                EmployeeDAO employeeDAO = daoFactory.getEmployeeDAO();
-                Employee employee = employeeDAO.find(Integer.parseInt(punchObject.getBadge().getId()));
-
+                    // Providing the arguments for the PreparedStatement
+                   
+                    ps.setInt(1, punchObject.getTerminalId());
+                    
+                    ps.setString(2, punchObject.getBadge().getId());
                
-            
-                System.out.println("EMPLOYEE IS FULL");
-                
-                // Providing the arguments for the PreparedStatement
-                ps.setInt(1, terminalId);
-                ps.setString(2, punchObject.getBadge().getId());
-                ps.setTimestamp(3, Timestamp.valueOf(punchObject.getOriginalTimeStamp()));
-                ps.setInt(4, punchObject.getEventType().ordinal());
-                
-                
+                    ps.setTimestamp(3, Timestamp.valueOf(punchObject.getOriginalTimeStamp()));
+
+                    ps.setInt(4, punchObject.getEventType().ordinal());
+
                 // Executing the query and executeUpdate() returns the number of
                 // row affected by the query so storing it in an int variable
                 int rowsAffected = ps.executeUpdate();
-             
+                
                 // If an error occurs during insertion, then returning 0
                 if (rowsAffected == 0){
                     return 0;

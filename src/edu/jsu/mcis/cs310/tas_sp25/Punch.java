@@ -23,7 +23,7 @@ public class Punch{
        this.terminalId = terminalId;
        this.badge = badge;
        this.eventType = eventType;
-       this.originalTimeStamp = LocalDateTime.now();
+       this.originalTimeStamp = LocalDateTime.now().withSecond(0).withNano(0);
    }
    
    // Second Constructor
