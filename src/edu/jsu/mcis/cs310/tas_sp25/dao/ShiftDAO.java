@@ -6,12 +6,19 @@ import java.time.LocalTime;
 import java.util.*;
 
 /**
+ * The `ShiftDAO` class provides methods to interact with the database and retrieve shift-related data.
+ * It uses SQL queries to fetch shift details and maps them to `Shift` objects.
+ *
+ * 
  * @author denzel
  * @author Mahin Patel
  */
 public class ShiftDAO {
 
+    // Define a SQL query to find a shift by its ID
     private static final String QUERY_FIND_SHIFT = "SELECT * FROM shift WHERE id = ?";
+    
+    // Define a SQL query to find an employee by their badge ID
     private static final String QUERY_FIND_EMPLOYEE = "SELECT * FROM employee WHERE badgeid =?";
 
     private final DAOFactory daoFactory;
@@ -32,13 +39,14 @@ public class ShiftDAO {
      */
     public Shift find(int shiftId) {
         Shift shift = null;
-        Connection cont = null; // Declaring connection here
+        Connection cont = null; //Declaring connection here
 
         try {
-            cont = daoFactory.getConnection(); // Get connection
-            PreparedStatement preparedStatement = cont.prepareStatement(QUERY_FIND_SHIFT);
-            preparedStatement.setInt(1, shiftId);
+            cont = daoFactory.getConnection(); //Get connection
+            PreparedStatement preparedStatement = cont.prepareStatement(QUERY_FIND_SHIFT); //Prepare the SQL query 
+            preparedStatement.setInt(1, shiftId); //Set the shift ID parameter in the query
 
+            //Execute the query and get the result set
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     shift = mapResultSetToShift(resultSet);
@@ -48,6 +56,7 @@ public class ShiftDAO {
             throw new DAOException(e.getMessage());
         }
 
+        //Return the Shift object (or null if not found)
         return shift;
     }
 
@@ -58,14 +67,15 @@ public class ShiftDAO {
      * @return The Shift object associated with the given badge ID, or null if not found.
      */
     public Shift find(Badge badge) {
-        Shift shift = null;
-        Connection cont = null; // Declaring connection here
+        Shift shift = null; //Declare a Shift object
+        Connection cont = null; //Declaring connection here
 
         try {
-            cont = daoFactory.getConnection(); // Get connection
-            PreparedStatement preparedStatement = cont.prepareStatement(QUERY_FIND_EMPLOYEE);
-            preparedStatement.setString(1, badge.getId());
+            cont = daoFactory.getConnection(); //Get connection
+            PreparedStatement preparedStatement = cont.prepareStatement(QUERY_FIND_EMPLOYEE); //Prepare the SQL query
+            preparedStatement.setString(1, badge.getId()); //Set the badge ID parameter
 
+            //Execute the query and get the result set
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     int shiftId = resultSet.getInt("shiftid");
@@ -76,6 +86,7 @@ public class ShiftDAO {
             throw new DAOException(e.getMessage());
         } 
 
+         // Return the Shift object (or null if not found)
         return shift;
     }
 
@@ -89,6 +100,7 @@ public class ShiftDAO {
     private Shift mapResultSetToShift(ResultSet resultSet) throws SQLException {
         HashMap<String, Object> shiftData = new HashMap<>();
 
+        // Populate the HashMap with data from the ResultSet
         shiftData.put("shiftid", resultSet.getInt("id"));
         shiftData.put("description", resultSet.getString("description"));
         shiftData.put("shiftstart", resultSet.getObject("shiftstart", LocalTime.class));
@@ -100,6 +112,7 @@ public class ShiftDAO {
         shiftData.put("lunchstop", resultSet.getObject("lunchstop", LocalTime.class));
         shiftData.put("lunchthreshold", resultSet.getInt("lunchthreshold"));
 
+        // Create and return a new Shift object using the HashMap
         return new Shift(shiftData);
         
     }
