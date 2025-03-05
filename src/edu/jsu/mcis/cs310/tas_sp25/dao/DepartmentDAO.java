@@ -18,44 +18,46 @@ import java.sql.SQLException;
 public class DepartmentDAO {
     
     // SQL query to fetch a department based on its ID
-    private static final String QUERY_FIND = "SELECT * FROM department WHERE id = ?";
+    private static final String QUERY_FIND_DEPARTMENT = "SELECT * FROM department WHERE id = ?";
+    
     // DAOFactory instance to get database connections
     private final DAOFactory daoFactory;
 
     /**
-    * Constructor for DepartmentDAO
-     * @param daoFactory The factory that provides access to the database connection
-    */
+     * Constructor for DepartmentDAO.
+     * 
+     * @param daoFactory The factory that provides access to the database connection.
+     */
     public DepartmentDAO(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
    
     /**
-    * Retrieves a department from the database using its ID.
-    * @param id The unique identifier of the department to find.
-    * @return A Department object if found, otherwise null.
-    */
-    public Department find(int id) {
-        Department department = null;
+     * Retrieves a department from the database using its ID.
+     * 
+     * @param departmentId The unique ID of the department.
+     * @return A Department object if found, otherwise null.
+     * @throws DAOException If there is an error retrieving the department.
+     */
+    public Department find(int departmentId) {
+        try (Connection conn = daoFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_FIND_DEPARTMENT)) {
 
-        Connection conn = daoFactory.getConnection();
-        try (
-             PreparedStatement ps = conn.prepareStatement(QUERY_FIND)) {
+            stmt.setInt(1, departmentId);
 
-            ps.setInt(1, id);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String description = rs.getString("description");
-                    int termid = rs.getInt("terminalid");
-                    department = new Department(id, description, termid);
+            try (ResultSet result_Set = stmt.executeQuery()) {
+                if (result_Set.next()) {
+                    return new Department(
+                        departmentId,
+                        result_Set.getString("description"),
+                        result_Set.getInt("terminalid")
+                    );
                 }
             }
-
         } catch (SQLException e) {
             throw new DAOException(e.getMessage());
         }
 
-        return department;
+        return null;
     }
 }
