@@ -28,8 +28,9 @@ public class PunchDAO {
     // Writing queries to pass into prepareStatement
     private static final String Query_INSERT = "INSERT INTO event (terminalid, badgeid, timestamp, eventtypeid) VALUES (?,?,?,?);";
     private static final String Query_FIND = "SELECT * FROM event WHERE id = ?";
-    private static final String Query_PUNCH_FIND = "SELECT * FROM event WHERE badgeid = ? and timestamp = ?";
     
+    // Using DATE() to extract the date part of the timestamp
+    private static final String Query_PUNCH_FIND = "SELECT * FROM event WHERE badgeid = ? and DATE(timestamp) = ?"; 
     
     public final DAOFactory daoFactory;
     
@@ -239,17 +240,53 @@ public class PunchDAO {
                 
                 // Executing the PreparedStatement
                 boolean hasResults = ps.execute();
-                
+                       
                 // If query has results, then retrieving the data
                 if (hasResults){
+                    
                     
                     // Getting result set and storing it in the ResultSet variable
                     rs = ps.getResultSet();
                     
                     // while loop to loop through the result set
                     while(rs.next()){
-                        
                        
+                        Punch resultSetPunch = null;
+                        // Since we are creating existing punches, we can use the second constructor
+                        //Punch(id, terminalId, badge, originaltimestamp, eventType)
+                        
+                        // Getting the terminalid and storing it in a variable
+                        int id = rs.getInt("id");  
+                        
+                        // Getting the terminalid and storing it in a variable
+                        int terminalId = rs.getInt("terminalid");      
+                        
+                        // Getting the badgeid and storing it in a variable
+                        String badgeId = rs.getString("badgeid");
+                        
+                        // Getting the eventtypeid and storing it in a variable
+                        int eventTypeId = rs.getInt("eventtypeid");
+                        
+                        // Getting a BadgeDAO instance from the daoFactory
+                        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();   
+                        
+                        // Using the BadgeDAO instance to create a new Badge object,
+                        // then using its find method to find the badgeId
+                        Badge newBadge = badgeDAO.find(badgeId);                         
+                        
+                        // Getting the originalTimeStamp and converting it to local time
+                        // with the help of toLocalDateTime function
+                        LocalDateTime originalTimeStamp = rs.getTimestamp("timestamp").toLocalDateTime(); 
+                        
+                        //Getting the eventType and mapping it to the EventType enum
+                        EventType eventType = EventType.values()[eventTypeId];             
+                        
+                        // Creating a new Punch object and providing the data obtained from the resultSet to the constructor
+                        resultSetPunch = new Punch(id, terminalId, badge, originalTimeStamp, eventType); 
+                        
+                        // Adding the new Punch object to the ArrayList
+                        punchList.add(resultSetPunch);
+                        
                     }
                     
                 }
