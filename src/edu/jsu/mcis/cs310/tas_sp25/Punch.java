@@ -5,11 +5,11 @@
  */
 package edu.jsu.mcis.cs310.tas_sp25;
 
+import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 public class Punch {
 
@@ -89,11 +89,15 @@ public class Punch {
         if (eventType == EventType.TIME_OUT) {
             this.adjustedTimeStamp = original;
             this.adjustmentType = PunchAdjustmentType.NONE;
+            return;
         }
 
         // Skip Adjustment for Weekend Punches
         if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
-            adjustToNearestInterval(roundInterval);
+            adjusted = adjustToNearestInterval(original, roundInterval);
+            adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
+            this.adjustedTimeStamp = adjusted;
+            this.adjustmentType = adjustmentType;
             return;
         }
 
@@ -104,9 +108,7 @@ public class Punch {
         } else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(shiftStop) && punchTime.isBefore(shiftStop.plusMinutes(roundInterval))) {
             adjusted = original.with(shiftStop);
             adjustmentType = PunchAdjustmentType.SHIFT_STOP;
-        } 
-
-        // Lunch Start & Stop Adjustment
+        } // Lunch Start & Stop Adjustment
         else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(lunchStart.minusMinutes(roundInterval)) && punchTime.isBefore(lunchStop)) {
             adjusted = original.with(lunchStart);
             adjustmentType = PunchAdjustmentType.LUNCH_START;
@@ -114,15 +116,20 @@ public class Punch {
             adjusted = original.with(lunchStop);
             adjustmentType = PunchAdjustmentType.LUNCH_STOP;
         }
-        
+
         //Grace Period Adjustment
-        if (eventType == EventType.CLOCK_IN && punchTime.isAfter(shiftStart) && punchTime.isBefore(shiftStart.plusMinutes(gracePeriod))) {
-            adjusted = original.with(shiftStart);
-            adjustmentType = PunchAdjustmentType.SHIFT_START; 
-        } else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(shiftStop.minusMinutes(gracePeriod)) && punchTime.isBefore(shiftStop)) {
-            adjusted = original.with(shiftStop);
-            adjustmentType = PunchAdjustmentType.SHIFT_STOP; 
+        if (adjustmentType == PunchAdjustmentType.NONE) {
+            if (eventType == EventType.CLOCK_IN && punchTime.isAfter(shiftStart) && punchTime.isBefore(shiftStart.plusMinutes(gracePeriod))) {
+                adjusted = original.with(shiftStart);
+                adjustmentType = PunchAdjustmentType.SHIFT_START;
+            } else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(shiftStop.minusMinutes(gracePeriod)) && punchTime.isBefore(shiftStop)) {
+                adjusted = original.with(shiftStop);
+                adjustmentType = PunchAdjustmentType.SHIFT_STOP;
+            }
         }
+        
+        this.adjustedTimeStamp = adjusted;
+        this.adjustmentType = adjustmentType;
 
     }
 
@@ -149,22 +156,17 @@ public class Punch {
 
     }
 
-    /**
-     * Rounds the punch timestamp to the nearest interval.
-     *
-     * @param interval The interval in minutes.
-     */
-    private void adjustToNearestInterval(int interval) {
-        int minutes = originalTimeStamp.getMinute();
+    //Rounds the punch timestamp to the nearest interval.
+    private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval){
+        Timestamp timestamp = Timestamp.valueOf(time);
+        LocalDateTime local = timestamp.toLocalDateTime().withSecond(0).withNano(0);
+        
+        int minutes = local.getMinute();
         int remainder = minutes % interval;
-
-        if (remainder == 0) {
-            this.adjustmentType = PunchAdjustmentType.NONE;
-        } else {
-            int adjustment = (remainder < interval / 2) ? -remainder : (interval - remainder);
-            this.adjustedTimeStamp = originalTimeStamp.plusMinutes(adjustment).truncatedTo(ChronoUnit.MINUTES);
-            this.adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
-        }
+        int adjustment = (remainder < interval / 2) ? -remainder : (interval - remainder);
+        
+        return local.plusMinutes(adjustment);
+        
     }
 
 }
