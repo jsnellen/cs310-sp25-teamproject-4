@@ -30,7 +30,9 @@ public class PunchDAO {
     private static final String Query_FIND = "SELECT * FROM event WHERE id = ?";
     
     // Using DATE() to extract the date part of the timestamp
-    private static final String Query_PUNCH_FIND = "SELECT * FROM event WHERE badgeid = ? and DATE(timestamp) = ?"; 
+    private static final String Query_LIST = "SELECT * FROM event WHERE badgeid = ? and DATE(timestamp) = ? ORDER BY timestamp ASC"; 
+    
+    private static final String Query_LIST_BETWEEN = "SELECT * FROM event WHERE badgeid = ? and DATE(timestamp) BETWEEN ? AND ? ORDER BY timestamp ASC"; 
     
     public final DAOFactory daoFactory;
     
@@ -230,7 +232,7 @@ public class PunchDAO {
             if (conn.isValid(0)) {
                 
                 //Creating the query as a PreparedStatement
-                ps = conn.prepareStatement(Query_PUNCH_FIND);
+                ps = conn.prepareStatement(Query_LIST);
                 
                 // Providing the arguments for the PreparedStatement
                 ps.setString(1, badge.getId());
@@ -304,5 +306,22 @@ public class PunchDAO {
         
         // Returning the ArrayList
         return punchList;
+    }
+    
+    public ArrayList<Punch> list(Badge badge, LocalDate begin, LocalDate end){
+    
+         // Initializing an ArrayList to store the results
+        ArrayList<Punch> punchList_Int = new ArrayList<>();
+       
+        // for loop to loop through each date in the interval
+        for (LocalDate date = begin; date.isBefore((end).plusDays(1)); date = date.plusDays(1)){
+
+            // Using the list method to get an ArrayList of punches from the current date
+            // And adding them to the punchList_Int ArrayList
+            punchList_Int.addAll(list(badge, date));
+        }
+        
+        // Returning the ArrayList
+        return punchList_Int;
     }
 }
