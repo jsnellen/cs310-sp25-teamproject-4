@@ -2,6 +2,7 @@
  *
  * @author evanranjitkar
  * @author Tanner Thomas
+ * @author mahin patel
  */
 package edu.jsu.mcis.cs310.tas_sp25;
 
@@ -108,7 +109,9 @@ public class Punch {
         } else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(shiftStop) && punchTime.isBefore(shiftStop.plusMinutes(roundInterval))) {
             adjusted = original.with(shiftStop);
             adjustmentType = PunchAdjustmentType.SHIFT_STOP;
-        } // Lunch Start & Stop Adjustment
+        } 
+
+        // Lunch Start & Stop Adjustment
         else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(lunchStart.minusMinutes(roundInterval)) && punchTime.isBefore(lunchStop)) {
             adjusted = original.with(lunchStart);
             adjustmentType = PunchAdjustmentType.LUNCH_START;
