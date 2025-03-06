@@ -109,9 +109,7 @@ public class Punch {
         } else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(shiftStop) && punchTime.isBefore(shiftStop.plusMinutes(roundInterval))) {
             adjusted = original.with(shiftStop);
             adjustmentType = PunchAdjustmentType.SHIFT_STOP;
-        } 
-
-        // Lunch Start & Stop Adjustment
+        } // Lunch Start & Stop Adjustment
         else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(lunchStart.minusMinutes(roundInterval)) && punchTime.isBefore(lunchStop)) {
             adjusted = original.with(lunchStart);
             adjustmentType = PunchAdjustmentType.LUNCH_START;
@@ -130,7 +128,24 @@ public class Punch {
                 adjustmentType = PunchAdjustmentType.SHIFT_STOP;
             }
         }
+
+        // Dock Penalty Adjustment
+        if (adjustmentType == PunchAdjustmentType.NONE) {
+            if (eventType == EventType.CLOCK_IN && punchTime.isAfter(shiftStart) && punchTime.isBefore(shiftStart.plusMinutes(gracePeriod))) {
+                adjusted = original.with(shiftStart.plusMinutes(dockPenalty));
+                adjustmentType = PunchAdjustmentType.SHIFT_DOCK;
+            } else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(shiftStop.minusMinutes(dockPenalty))
+            && punchTime.isBefore(shiftStop.minusMinutes(gracePeriod))) {
+                adjusted = original.with(shiftStop.minusMinutes(dockPenalty));
+                adjustmentType = PunchAdjustmentType.SHIFT_DOCK;
+            }
+        }
         
+        if (adjusted.equals(original)){
+            adjusted = adjustToNearestInterval(original, roundInterval);
+            adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
+        }
+
         this.adjustedTimeStamp = adjusted;
         this.adjustmentType = adjustmentType;
 
@@ -160,16 +175,16 @@ public class Punch {
     }
 
     //Rounds the punch timestamp to the nearest interval.
-    private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval){
+    private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval) {
         Timestamp timestamp = Timestamp.valueOf(time);
         LocalDateTime local = timestamp.toLocalDateTime().withSecond(0).withNano(0);
-        
+
         int minutes = local.getMinute();
         int remainder = minutes % interval;
         int adjustment = (remainder < interval / 2) ? -remainder : (interval - remainder);
-        
+
         return local.plusMinutes(adjustment);
-        
+
     }
 
 }
