@@ -109,9 +109,7 @@ public class Punch {
         } else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(shiftStop) && punchTime.isBefore(shiftStop.plusMinutes(roundInterval))) {
             adjusted = original.with(shiftStop);
             adjustmentType = PunchAdjustmentType.SHIFT_STOP;
-        } 
-
-        // Lunch Start & Stop Adjustment
+        } // Lunch Start & Stop Adjustment
         else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(lunchStart.minusMinutes(roundInterval)) && punchTime.isBefore(lunchStop)) {
             adjusted = original.with(lunchStart);
             adjustmentType = PunchAdjustmentType.LUNCH_START;
@@ -131,29 +129,29 @@ public class Punch {
             }
         }
 
+
         // Dock Penalty Adjustment
         if (adjustmentType == PunchAdjustmentType.NONE) {
-            if (eventType == EventType.CLOCK_IN && punchTime.isAfter(shiftStart) && punchTime.isBefore(shiftStart.plusMinutes(gracePeriod))) {
+            if (eventType == EventType.CLOCK_IN && punchTime.isAfter(shiftStart.plusMinutes(gracePeriod))) {
                 adjusted = original.with(shiftStart.plusMinutes(dockPenalty));
                 adjustmentType = PunchAdjustmentType.SHIFT_DOCK;
-            } else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(shiftStop.minusMinutes(dockPenalty))
-                    && punchTime.isBefore(shiftStop.minusMinutes(gracePeriod))) {
+            } else if (eventType == EventType.CLOCK_OUT && punchTime.isBefore(shiftStop.minusMinutes(gracePeriod))) {
                 adjusted = original.with(shiftStop.minusMinutes(dockPenalty));
                 adjustmentType = PunchAdjustmentType.SHIFT_DOCK;
             }
         }
 
-        if (adjusted.equals(original)) {
-            if (adjustmentType == PunchAdjustmentType.NONE) {
-                this.adjustmentType = PunchAdjustmentType.NONE;
-            } else {
-                adjusted = adjustToNearestInterval(original, roundInterval);
-                this.adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
-            }
-        }
-
         this.adjustedTimeStamp = adjusted;
         this.adjustmentType = adjustmentType;
+        
+            if (adjustmentType == PunchAdjustmentType.NONE) {
+            LocalDateTime rounded = adjustToNearestInterval(original, roundInterval);
+
+            if (!rounded.equals(original)) {
+                this.adjustedTimeStamp = rounded;
+                this.adjustmentType = PunchAdjustmentType.NONE;
+            }
+        }
 
     }
 
@@ -190,18 +188,17 @@ public class Punch {
 
     //Rounds the punch timestamp to the nearest interval.
     private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval) {
+        time = time.withSecond(0).withNano(0);
+
         int minutes = time.getMinute();
         int remainder = minutes % interval;
-
-        time = time.withSecond(0).withNano(0);
 
         if (remainder == 0) {
             return time;
         }
 
         int adjustment = (remainder < interval / 2) ? -remainder : (interval - remainder);
-        
-        return time.plusMinutes(adjustment).withSecond(0).withNano(0);
+        return time.plusMinutes(adjustment);
 
     }
 
