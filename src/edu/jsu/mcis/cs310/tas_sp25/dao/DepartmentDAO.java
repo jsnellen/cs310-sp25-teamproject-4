@@ -40,9 +40,16 @@ public class DepartmentDAO {
      * @throws DAOException If there is an error retrieving the department.
      */
     public Department find(int departmentId) {
-        try (Connection conn = daoFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(QUERY_FIND_DEPARTMENT)) {
-
+        
+        PreparedStatement stmt = null;
+        
+        try{
+            
+            Connection conn = daoFactory.getConnection();
+            
+            if(conn.isValid(0)){
+            
+            stmt = conn.prepareStatement(QUERY_FIND_DEPARTMENT);
             stmt.setInt(1, departmentId);
 
             try (ResultSet result_Set = stmt.executeQuery()) {
@@ -54,6 +61,8 @@ public class DepartmentDAO {
                     );
                 }
             }
+            }
+            
         } catch (SQLException e) {
             throw new DAOException(e.getMessage());
         }
