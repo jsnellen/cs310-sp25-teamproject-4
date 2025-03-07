@@ -109,7 +109,9 @@ public class Punch {
         } else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(shiftStop) && punchTime.isBefore(shiftStop.plusMinutes(roundInterval))) {
             adjusted = original.with(shiftStop);
             adjustmentType = PunchAdjustmentType.SHIFT_STOP;
-        } // Lunch Start & Stop Adjustment
+        } 
+
+        // Lunch Start & Stop Adjustment
         else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(lunchStart.minusMinutes(roundInterval)) && punchTime.isBefore(lunchStop)) {
             adjusted = original.with(lunchStart);
             adjustmentType = PunchAdjustmentType.LUNCH_START;
@@ -135,15 +137,19 @@ public class Punch {
                 adjusted = original.with(shiftStart.plusMinutes(dockPenalty));
                 adjustmentType = PunchAdjustmentType.SHIFT_DOCK;
             } else if (eventType == EventType.CLOCK_OUT && punchTime.isAfter(shiftStop.minusMinutes(dockPenalty))
-            && punchTime.isBefore(shiftStop.minusMinutes(gracePeriod))) {
+                    && punchTime.isBefore(shiftStop.minusMinutes(gracePeriod))) {
                 adjusted = original.with(shiftStop.minusMinutes(dockPenalty));
                 adjustmentType = PunchAdjustmentType.SHIFT_DOCK;
             }
         }
-        
-        if (adjusted.equals(original)){
-            adjusted = adjustToNearestInterval(original, roundInterval);
-            adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
+
+        if (adjusted.equals(original)) {
+            if (adjustmentType == PunchAdjustmentType.NONE) {
+                this.adjustmentType = PunchAdjustmentType.NONE;
+            } else {
+                adjusted = adjustToNearestInterval(original, roundInterval);
+                this.adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
+            }
         }
 
         this.adjustedTimeStamp = adjusted;
@@ -170,20 +176,32 @@ public class Punch {
         return stringBuilderResult.toString();
     }
 
-    public void printAdjusted() {
+    public String printAdjusted() {
+        DateTimeFormatter timeStampFormat = DateTimeFormatter.ofPattern("EEE MM/dd/uuuu HH:mm:ss");
 
+        StringBuilder sb = new StringBuilder();
+        sb.append("#").append(badge.getId()).append(" ")
+                .append(eventType.toString()).append(": ")
+                .append(adjustedTimeStamp.format(timeStampFormat).toUpperCase())
+                .append(" (").append(adjustmentType.toString()).append(")");
+
+        return sb.toString();
     }
 
     //Rounds the punch timestamp to the nearest interval.
     private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval) {
-        Timestamp timestamp = Timestamp.valueOf(time);
-        LocalDateTime local = timestamp.toLocalDateTime().withSecond(0).withNano(0);
-
-        int minutes = local.getMinute();
+        int minutes = time.getMinute();
         int remainder = minutes % interval;
-        int adjustment = (remainder < interval / 2) ? -remainder : (interval - remainder);
 
-        return local.plusMinutes(adjustment);
+        time = time.withSecond(0).withNano(0);
+
+        if (remainder == 0) {
+            return time;
+        }
+
+        int adjustment = (remainder < interval / 2) ? -remainder : (interval - remainder);
+        
+        return time.plusMinutes(adjustment).withSecond(0).withNano(0);
 
     }
 
