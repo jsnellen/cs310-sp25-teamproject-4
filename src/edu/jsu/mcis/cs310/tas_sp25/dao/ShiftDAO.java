@@ -42,7 +42,7 @@ public class ShiftDAO {
         Connection cont = null; //Declaring connection here
 
         try {
-            cont = daoFactory.getConnection(); //Get connection
+             cont = daoFactory.getConnection(); //Get connection
             PreparedStatement preparedStatement = cont.prepareStatement(QUERY_FIND_SHIFT); //Prepare the SQL query 
             preparedStatement.setInt(1, shiftId); //Set the shift ID parameter in the query
 

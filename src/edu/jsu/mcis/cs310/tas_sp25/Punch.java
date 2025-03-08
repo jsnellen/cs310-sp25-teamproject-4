@@ -92,7 +92,6 @@ public class Punch {
             this.adjustmentType = PunchAdjustmentType.NONE;
             return;
         }
-
         // Skip Adjustment for Weekend Punches
         if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
             adjusted = adjustToNearestInterval(original, roundInterval);
@@ -129,28 +128,32 @@ public class Punch {
             }
         }
 
-
         // Dock Penalty Adjustment
         if (adjustmentType == PunchAdjustmentType.NONE) {
-            if (eventType == EventType.CLOCK_IN && punchTime.isAfter(shiftStart.plusMinutes(gracePeriod))) {
+            if (eventType == EventType.CLOCK_IN && punchTime.isAfter(shiftStart.plusMinutes(gracePeriod))
+                    && punchTime.isBefore(shiftStart.plusMinutes(gracePeriod + dockPenalty))) {
                 adjusted = original.with(shiftStart.plusMinutes(dockPenalty));
                 adjustmentType = PunchAdjustmentType.SHIFT_DOCK;
-            } else if (eventType == EventType.CLOCK_OUT && punchTime.isBefore(shiftStop.minusMinutes(gracePeriod))) {
+            } else if (eventType == EventType.CLOCK_OUT && punchTime.isBefore(shiftStop.minusMinutes(gracePeriod))
+                    && punchTime.isAfter(shiftStop.minusMinutes(gracePeriod + dockPenalty))) {
                 adjusted = original.with(shiftStop.minusMinutes(dockPenalty));
                 adjustmentType = PunchAdjustmentType.SHIFT_DOCK;
             }
         }
 
-        this.adjustedTimeStamp = adjusted;
         this.adjustmentType = adjustmentType;
-        
-            if (adjustmentType == PunchAdjustmentType.NONE) {
-            LocalDateTime rounded = adjustToNearestInterval(original, roundInterval);
 
-            if (!rounded.equals(original)) {
-                this.adjustedTimeStamp = rounded;
-                this.adjustmentType = PunchAdjustmentType.NONE;
+        if (adjustmentType == PunchAdjustmentType.NONE) {
+            if (original.getMinute() % roundInterval == 0) {
+                //If already aligned with the interval, keep it as NONE
+                this.adjustedTimeStamp = original.withSecond(0).withNano(0);
+            } else {
+                //apply interval rounding
+                this.adjustedTimeStamp = adjustToNearestInterval(original, roundInterval);
+                this.adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
             }
+        } else {
+            this.adjustedTimeStamp = adjusted; //We can also use "this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);"
         }
 
     }
@@ -188,18 +191,29 @@ public class Punch {
 
     //Rounds the punch timestamp to the nearest interval.
     private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval) {
-        time = time.withSecond(0).withNano(0);
+        time = time.withSecond(0).withNano(0); // Remove seconds/nanoseconds
 
-        int minutes = time.getMinute();
-        int remainder = minutes % interval;
+        int minute = time.getMinute();
+        int remainder = minute % interval;
 
         if (remainder == 0) {
-            return time;
+            return time; // Already aligned, no change needed
         }
 
-        int adjustment = (remainder < interval / 2) ? -remainder : (interval - remainder);
-        return time.plusMinutes(adjustment);
+        int roundedMinute;
 
+        if (remainder < interval / 2) {
+            roundedMinute = minute - remainder; // Round down
+        } else {
+            roundedMinute = minute + (interval - remainder); // Round up
+        }
+
+        // Prevent "Minute 60" overflow
+        if (roundedMinute >= 60) {
+            return time.plusHours(1).withMinute(0);
+        } else {
+            return time.withMinute(roundedMinute);
+        }
     }
 
 }
