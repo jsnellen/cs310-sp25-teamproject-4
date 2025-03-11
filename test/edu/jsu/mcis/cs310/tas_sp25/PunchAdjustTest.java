@@ -19,7 +19,6 @@ public class PunchAdjustTest {
     public void testAdjustPunchesShift1Weekday() {
 
         /* Get Shift Ruleset and Punch Data */
-        
         PunchDAO punchDAO = daoFactory.getPunchDAO();
         ShiftDAO shiftDAO = daoFactory.getShiftDAO();
 
@@ -31,14 +30,12 @@ public class PunchAdjustTest {
         Punch p4 = punchDAO.find(3716);
 
         /* Adjust Punches According to Shift Rulesets */
-        
         p1.adjust(s1);
         p2.adjust(s1);
         p3.adjust(s1);
         p4.adjust(s1);
 
         /* Compare Adjusted Timestamps to Expected Values */
-        
         assertEquals("#28DC3FB8 CLOCK IN: FRI 09/07/2018 06:50:35", p1.printOriginal());
         assertEquals("#28DC3FB8 CLOCK IN: FRI 09/07/2018 07:00:00 (Shift Start)", p1.printAdjusted());
 
@@ -57,7 +54,6 @@ public class PunchAdjustTest {
     public void testAdjustPunchesShift1Weekend() {
 
         /* Get Shift Ruleset and Punch Data */
-        
         PunchDAO punchDAO = daoFactory.getPunchDAO();
         ShiftDAO shiftDAO = daoFactory.getShiftDAO();
 
@@ -67,12 +63,10 @@ public class PunchAdjustTest {
         Punch p2 = punchDAO.find(1162);
 
         /* Adjust Punches According to Shift Rulesets */
-        
         p1.adjust(s1);
         p2.adjust(s1);
 
         /* Compare Adjusted Timestamps to Expected Values */
-        
         assertEquals("#F1EE0555 CLOCK IN: SAT 08/11/2018 05:54:58", p1.printOriginal());
         assertEquals("#F1EE0555 CLOCK IN: SAT 08/11/2018 06:00:00 (Interval Round)", p1.printAdjusted());
 
@@ -85,7 +79,6 @@ public class PunchAdjustTest {
     public void testAdjustPunchesShift2Weekday() {
 
         /* Get Shift Ruleset and Punch Data */
-        
         PunchDAO punchDAO = daoFactory.getPunchDAO();
         ShiftDAO shiftDAO = daoFactory.getShiftDAO();
 
@@ -95,12 +88,10 @@ public class PunchAdjustTest {
         Punch p2 = punchDAO.find(5004);
 
         /* Adjust Punches According to Shift Rulesets */
-        
         p1.adjust(s2);
         p2.adjust(s2);
 
         /* Compare Adjusted Timestamps to Expected Values */
-        
         assertEquals("#08D01475 CLOCK IN: TUE 09/18/2018 11:59:33", p1.printOriginal());
         assertEquals("#08D01475 CLOCK IN: TUE 09/18/2018 12:00:00 (Shift Start)", p1.printAdjusted());
 
@@ -113,7 +104,6 @@ public class PunchAdjustTest {
     public void testAdjustPunchesShift2Weekend() {
 
         /* Get Shift Ruleset and Punch Data */
-        
         PunchDAO punchDAO = daoFactory.getPunchDAO();
         ShiftDAO shiftDAO = daoFactory.getShiftDAO();
 
@@ -123,12 +113,10 @@ public class PunchAdjustTest {
         Punch p2 = punchDAO.find(5541);
 
         /* Adjust Punches According to Shift Rulesets */
-        
         p1.adjust(s2);
         p2.adjust(s2);
 
         /* Compare Adjusted Timestamps to Expected Values */
-        
         assertEquals("#08D01475 CLOCK IN: SAT 09/22/2018 05:49:00", p1.printOriginal());
         assertEquals("#08D01475 CLOCK IN: SAT 09/22/2018 05:45:00 (Interval Round)", p1.printAdjusted());
 
@@ -141,7 +129,6 @@ public class PunchAdjustTest {
     public void testAdjustPunchesShift1SpecialCases() {
 
         /* Get Shift Ruleset and Punch Data */
-        
         PunchDAO punchDAO = daoFactory.getPunchDAO();
         ShiftDAO shiftDAO = daoFactory.getShiftDAO();
 
@@ -156,7 +143,6 @@ public class PunchAdjustTest {
         Punch p7 = punchDAO.find(4119); // Interval Adjustment After Shift (Out)
 
         /* Adjust Punches According to Shift Ruleset */
-        
         p1.adjust(s1);
         p2.adjust(s1);
         p3.adjust(s1);
@@ -166,7 +152,6 @@ public class PunchAdjustTest {
         p7.adjust(s1);
 
         /* Compare Adjusted Timestamps to Expected Values */
-        
         assertEquals("#BE51FA92 CLOCK IN: WED 08/01/2018 06:48:20", p1.printOriginal());
         assertEquals("#BE51FA92 CLOCK IN: WED 08/01/2018 07:00:00 (Shift Start)", p1.printAdjusted());
 
@@ -187,6 +172,85 @@ public class PunchAdjustTest {
 
         assertEquals("#ADD650A8 CLOCK OUT: TUE 09/11/2018 15:37:12", p7.printOriginal());
         assertEquals("#ADD650A8 CLOCK OUT: TUE 09/11/2018 15:30:00 (Shift Stop)", p7.printAdjusted());
+
+    }
+
+    @Test
+    public void testAdjustPunchesLate() {
+
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+        ShiftDAO shiftDAO = daoFactory.getShiftDAO();
+
+        Shift s1 = shiftDAO.find(1);
+
+        Punch p1 = punchDAO.find(201);
+
+        p1.adjust(s1);
+
+        assertEquals("#4DAC9951 CLOCK IN: WED 08/01/2018 07:16:03", p1.printOriginal());
+        assertEquals("#4DAC9951 CLOCK IN: WED 08/01/2018 07:15:00 (Shift Dock)", p1.printAdjusted());
+
+    }
+
+    @Test
+    public void testAdjustPunchesEarly() {
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+        ShiftDAO shiftDAO = daoFactory.getShiftDAO();
+
+        Shift s1 = shiftDAO.find(1);
+
+        Punch p1 = punchDAO.find(3153);
+
+        p1.adjust(s1);
+
+        assertEquals("#4E6E296E CLOCK IN: FRI 08/31/2018 06:25:19", p1.printOriginal());
+        assertEquals("#4E6E296E CLOCK IN: FRI 08/31/2018 06:30:00 (Interval Round)", p1.printAdjusted());
+
+    }
+
+    @Test
+    public void testAdjustPunchesLunchEarly() {
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+        ShiftDAO shiftDAO = daoFactory.getShiftDAO();
+
+        Shift s1 = shiftDAO.find(1);
+
+        Punch p1 = punchDAO.find(207);
+
+        p1.adjust(s1);
+
+        assertEquals("#922370AA CLOCK IN: WED 08/01/2018 12:27:17", p1.printOriginal());
+        assertEquals("#922370AA CLOCK IN: WED 08/01/2018 12:30:00 (Lunch Stop)", p1.printAdjusted());
+    }
+
+    @Test
+    public void testAdjustPunchesShiftStart() {
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+        ShiftDAO shiftDAO = daoFactory.getShiftDAO();
+
+        Shift s1 = shiftDAO.find(1);
+
+        Punch p1 = punchDAO.find(4035);
+
+        p1.adjust(s1);
+
+        assertEquals("#8001201A CLOCK IN: TUE 09/11/2018 06:56:07", p1.printOriginal());
+        assertEquals("#8001201A CLOCK IN: TUE 09/11/2018 07:00:00 (Shift Start)", p1.printAdjusted());
+    }
+
+    @Test
+    public void testAdjustPunchesShift2Start() {
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+        ShiftDAO shiftDAO = daoFactory.getShiftDAO();
+
+        Shift s2 = shiftDAO.find(2);
+
+        Punch p1 = punchDAO.find(4943);
+
+        p1.adjust(s2);
+
+        assertEquals("#08D01475 CLOCK IN: TUE 09/18/2018 11:59:33", p1.printOriginal());
+        assertEquals("#08D01475 CLOCK IN: TUE 09/18/2018 12:00:00 (Shift Start)", p1.printAdjusted());
 
     }
 
