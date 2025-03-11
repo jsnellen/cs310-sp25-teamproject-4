@@ -64,6 +64,14 @@ public class Punch {
     public LocalDateTime getAdjustedTimeStamp() {
         return adjustedTimeStamp;
     }
+    
+    //This is for DAOUtility.java  
+    public PunchAdjustmentType getAdjustmentType() {
+        return this.adjustmentType;
+    }
+    public LocalDateTime getOriginaltimestamp() { 
+        return originalTimeStamp;
+    }
 
     public void adjust(Shift s) {
         // Store the original timestamp for the punch
@@ -155,7 +163,7 @@ public class Punch {
         } else {
             this.adjustedTimeStamp = adjusted; //We can also use "this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);"
         }
-
+        
     }
 
     // Print methods
