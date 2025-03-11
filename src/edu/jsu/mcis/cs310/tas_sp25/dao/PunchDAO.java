@@ -31,6 +31,7 @@ public class PunchDAO {
     
     // Using DATE() to extract the date part of the timestamp
     private static final String Query_LIST = "SELECT * FROM event WHERE badgeid = ? and DATE(timestamp) = ? ORDER BY timestamp ASC"; 
+    private static final String Query_LIST_FOLLOWING_DAY = "SELECT * FROM event WHERE badgeid = ? and DATE(timestamp) = ? ORDER BY timestamp ASC LIMIT 1"; 
     
     private static final String Query_LIST_BETWEEN = "SELECT * FROM event WHERE badgeid = ? and DATE(timestamp) BETWEEN ? AND ? ORDER BY timestamp ASC"; 
     
@@ -157,7 +158,7 @@ public class PunchDAO {
                 // Checking if the terminalId id of the punch matches the department terminal id
                 // and if the departmentTerminalId is 0
                 // If neither of these condition satisfies, then the punch is unauthorized
-                if(departmentTerminalId != terminalId && departmentTerminalId != 0 ){
+                if(departmentTerminalId != terminalId && terminalId != 0 ){
                     
                    return 0;
                    
@@ -263,18 +264,8 @@ public class PunchDAO {
                         // Getting the terminalid and storing it in a variable
                         int terminalId = rs.getInt("terminalid");      
                         
-                        // Getting the badgeid and storing it in a variable
-                        String badgeId = rs.getString("badgeid");
-                        
                         // Getting the eventtypeid and storing it in a variable
-                        int eventTypeId = rs.getInt("eventtypeid");
-                        
-                        // Getting a BadgeDAO instance from the daoFactory
-                        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();   
-                        
-                        // Using the BadgeDAO instance to create a new Badge object,
-                        // then using its find method to find the badgeId
-                        Badge newBadge = badgeDAO.find(badgeId);                         
+                        int eventTypeId = rs.getInt("eventtypeid");                      
                         
                         // Getting the originalTimeStamp and converting it to local time
                         // with the help of toLocalDateTime function
@@ -292,7 +283,61 @@ public class PunchDAO {
                     }
                     
                 }
+               
+                // Getting the first punch from the following day
+                LocalDate followingDay = date.plusDays(1);
                 
+                 //Creating the query as a PreparedStatement
+                ps = conn.prepareStatement(Query_LIST_FOLLOWING_DAY);
+                
+                // Providing the arguments for the PreparedStatement
+                ps.setString(1, badge.getId());
+                
+                // Converting LocalDate to Date
+                ps.setDate(2, java.sql.Date.valueOf(followingDay));
+                
+                // Executing the PreparedStatement
+                boolean followingDayHasResults = ps.execute();
+                       
+                // If query has results, then retrieving the data
+                if (followingDayHasResults){
+                    
+                    // Getting result set and storing it in the ResultSet variable
+                    ResultSet followingDayResultSet = ps.getResultSet();
+               
+                    while(followingDayResultSet.next()){
+                        
+                        // fd --> following day
+                        // Getting the terminalid and storing it in a variable
+                        int fdId = followingDayResultSet.getInt("id");  
+                        
+                        // Getting the terminalid and storing it in a variable
+                        int fdTerminalId = followingDayResultSet.getInt("terminalid");      
+                        
+                        // Getting the eventtypeid and storing it in a variable
+                        int fdEventTypeId = followingDayResultSet.getInt("eventtypeid");                     
+                        
+                        // Getting the originalTimeStamp and converting it to local time
+                        // with the help of toLocalDateTime function
+                        LocalDateTime fdOriginalTimeStamp = followingDayResultSet.getTimestamp("timestamp").toLocalDateTime(); 
+                        
+                        //Getting the eventType and mapping it to the EventType enum
+                        EventType fdEventType = EventType.values()[fdEventTypeId];             
+                        
+                        System.out.println(fdEventType);
+                        
+                        // if eventType is CLOCK_OUT or TIME_OUT, creating a new punch and adding it to the end of the ArrayList
+                        if(fdEventType == EventType.CLOCK_OUT || fdEventType == EventType.TIME_OUT){
+                        
+                            // Creating a new Punch object and providing the data obtained from the resultSet to the constructor
+                            Punch followingDayPunch = new Punch(fdId, fdTerminalId, badge, fdOriginalTimeStamp,  fdEventType); 
+                        
+                            // Adding the new Punch object to the ArrayList
+                            punchList.add(followingDayPunch);
+                        
+                        }
+                    }
+                }
             }
         } 
         catch (Exception e) { e.printStackTrace(); }

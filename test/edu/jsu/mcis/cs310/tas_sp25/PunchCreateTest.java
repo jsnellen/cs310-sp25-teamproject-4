@@ -43,8 +43,6 @@ public class PunchCreateTest {
         /* Insert Punch Into Database */
         
         int punchid = punchDAO.create(p1);
-        
-        System.out.println("Punch id: " + punchid);
 
         /* Retrieve New Punch */
         
@@ -52,8 +50,47 @@ public class PunchCreateTest {
 
         /* Compare Punches */
         
-        System.out.println("Expected : " + badgeid + terminalid + punchtype + ots.format(dtf));
-        System.out.println("Actual   : " + p2.getBadge().getId() + p2.getTerminalId() + p2.getEventType() + ots.format(dtf));
+        assertEquals(badgeid, p2.getBadge().getId());
+
+        rts = p2.getOriginalTimeStamp();
+
+        assertEquals(terminalid, p2.getTerminalId());
+        assertEquals(punchtype, p2.getEventType());
+        assertEquals(ots.format(dtf), rts.format(dtf));
+
+    }
+    @Test
+    public void testCreatePunch2() {
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
+
+        /* Create New Punch Object */
+        
+        Punch p1 = new Punch(103, badgeDAO.find("021890C0"), EventType.CLOCK_OUT);
+
+        /* Create Timestamp Objects */
+        
+        LocalDateTime ots, rts;
+
+        /* Get Punch Properties */
+        
+        String badgeid = p1.getBadge().getId();
+        ots = p1.getOriginalTimeStamp();
+        int terminalid = p1.getTerminalId();
+        EventType punchtype = p1.getEventType();
+
+        /* Insert Punch Into Database */
+        
+        int punchid = punchDAO.create(p1);
+
+        /* Retrieve New Punch */
+        
+        Punch p2 = punchDAO.find(punchid);
+
+        /* Compare Punches */
         
         assertEquals(badgeid, p2.getBadge().getId());
 
@@ -65,4 +102,85 @@ public class PunchCreateTest {
 
     }
 
+/**
+ *
+ * @author evanranjitkar
+ */
+    @Test
+    public void testCreatePunch3(){
+        
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
+
+        /* Create New Punch Object */
+        
+        Punch p1 = new Punch(0, badgeDAO.find("021890C0"), EventType.CLOCK_IN);
+
+        /* Create Timestamp Objects */
+        
+        LocalDateTime ots, rts;
+
+        /* Get Punch Properties */
+        
+        String badgeid = p1.getBadge().getId();
+        ots = p1.getOriginalTimeStamp();
+        int terminalid = p1.getTerminalId();
+        EventType punchtype = p1.getEventType();
+
+        /* Insert Punch Into Database */
+        
+        int punchid = punchDAO.create(p1);
+
+        /* Retrieve New Punch */
+        
+        Punch p2 = punchDAO.find(punchid);
+
+        /* Compare Punches */
+        
+        assertEquals(badgeid, p2.getBadge().getId());
+
+        rts = p2.getOriginalTimeStamp();
+
+        assertEquals(terminalid, p2.getTerminalId());
+        assertEquals(punchtype, p2.getEventType());
+        assertEquals(ots.format(dtf), rts.format(dtf));
+    }
+    
+    @Test
+    public void testCreatePunch4(){
+        
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
+
+        /* Create New Punch Object */
+        
+        Punch p1 = new Punch(104, badgeDAO.find("021890C0"), EventType.CLOCK_IN);
+
+        /* Create Timestamp Objects */
+        
+        LocalDateTime ots, rts;
+
+        /* Get Punch Properties */
+        
+        String badgeid = p1.getBadge().getId();
+        ots = p1.getOriginalTimeStamp();
+        int terminalid = p1.getTerminalId();
+        EventType punchtype = p1.getEventType();
+
+        /* Insert Punch Into Database */
+        
+        int punchid = punchDAO.create(p1);
+
+        /* Retrieve New Punch */
+        
+        Punch p2 = punchDAO.find(punchid);
+
+        assertEquals(p2, null);
+    }
 }
+    
+
