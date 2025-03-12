@@ -64,12 +64,13 @@ public class Punch {
     public LocalDateTime getAdjustedTimeStamp() {
         return adjustedTimeStamp;
     }
-    
+
     //This is for DAOUtility.java  
     public PunchAdjustmentType getAdjustmentType() {
         return this.adjustmentType;
     }
-    public LocalDateTime getOriginaltimestamp() { 
+
+    public LocalDateTime getOriginaltimestamp() {
         return originalTimeStamp;
     }
 
@@ -102,9 +103,12 @@ public class Punch {
         }
         // Skip Adjustment for Weekend Punches
         if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
-            adjusted = adjustToNearestInterval(original, roundInterval);
+            int remainder = original.getMinute() % roundInterval;
+            int adjustment = (remainder < roundInterval / 2) ? -remainder : (roundInterval - remainder);
+            adjusted = original.plusMinutes(adjustment);
+
             adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
-            this.adjustedTimeStamp = adjusted;
+            this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);
             this.adjustmentType = adjustmentType;
             return;
         }
@@ -152,18 +156,14 @@ public class Punch {
         this.adjustmentType = adjustmentType;
 
         if (adjustmentType == PunchAdjustmentType.NONE) {
-            if (original.getMinute() % roundInterval == 0) {
-                //If already aligned with the interval, keep it as NONE
-                this.adjustedTimeStamp = original.withSecond(0).withNano(0);
-            } else {
-                //apply interval rounding
-                this.adjustedTimeStamp = adjustToNearestInterval(original, roundInterval);
-                this.adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
-            }
+            // Directly round using LocalDateTime.plusMinutes()
+            this.adjustedTimeStamp = original.plusMinutes(roundInterval - (original.getMinute() % roundInterval))
+                    .withSecond(0).withNano(0);
+            this.adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
         } else {
-            this.adjustedTimeStamp = adjusted; //We can also use "this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);"
+            this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);
         }
-        
+
     }
 
     // Print methods
@@ -198,30 +198,29 @@ public class Punch {
     }
 
     //Rounds the punch timestamp to the nearest interval.
-    private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval) {
-        time = time.withSecond(0).withNano(0); // Remove seconds/nanoseconds
-
-        int minute = time.getMinute();
-        int remainder = minute % interval;
-
-        if (remainder == 0) {
-            return time; // Already aligned, no change needed
-        }
-
-        int roundedMinute;
-
-        if (remainder < interval / 2) {
-            roundedMinute = minute - remainder; // Round down
-        } else {
-            roundedMinute = minute + (interval - remainder); // Round up
-        }
-
-        // Prevent "Minute 60" overflow
-        if (roundedMinute >= 60) {
-            return time.plusHours(1).withMinute(0);
-        } else {
-            return time.withMinute(roundedMinute);
-        }
-    }
-
+//    private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval) {
+//        time = time.withSecond(0).withNano(0); // Remove seconds/nanoseconds
+//
+//        int minute = time.getMinute();
+//        int remainder = minute % interval;
+//
+//        if (remainder == 0) {
+//            return time; // Already aligned, no change needed
+//        }
+//
+//        int roundedMinute;
+//
+//        if (remainder < interval / 2) {
+//            roundedMinute = minute - remainder; // Round down
+//        } else {
+//            roundedMinute = minute + (interval - remainder); // Round up
+//        }
+//
+//        // Prevent "Minute 60" overflow
+//        if (roundedMinute >= 60) {
+//            return time.plusHours(1).withMinute(0);
+//        } else {
+//            return time.withMinute(roundedMinute);
+//        }
+//    }
 }
