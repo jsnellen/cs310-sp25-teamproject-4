@@ -101,7 +101,7 @@ public class Punch {
             this.adjustmentType = PunchAdjustmentType.NONE;
             return;
         }
-        
+
         // Skip Adjustment for Weekend Punches (apply only rounding)
         if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
             // Apply rounding for weekends (skip all other adjustments)
@@ -130,10 +130,6 @@ public class Punch {
             return;
         }
 
-
-
-
-
 //        // If we use adjustToNearestInterval()- ANOTHERWAY TO DO
 //        // Use adjustToNearestInterval for rounding
 //        if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
@@ -143,10 +139,6 @@ public class Punch {
 //            this.adjustmentType = adjustmentType;
 //            return;
 //        }
-        
-        
-        
-
         // Shift Start & Stop Adjustment
         if (eventType == EventType.CLOCK_IN && punchTime.isAfter(shiftStart.minusMinutes(roundInterval)) && punchTime.isBefore(shiftStart)) {
             adjusted = original.with(shiftStart);
@@ -210,9 +202,6 @@ public class Punch {
         this.adjustmentType = adjustmentType;
         this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);
 
-
-
-
 //   ANOTHER METHOD WE CAN USE
 //        this.adjustmentType = adjustmentType;
 //
@@ -229,7 +218,6 @@ public class Punch {
 //        } else {
 //            this.adjustedTimeStamp = adjusted; //We can also use "this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);"
 //        }
-
     }
 
     // Print methods
@@ -263,11 +251,8 @@ public class Punch {
         return sb.toString();
     }
 
-    
-    
-    
 // ANOTHER WAY TO DO - We can use adjustToNearestInterval()
-    
+
 //// Adjusts the timestamp to the nearest interval
 //    private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval) {
 //        // Remove seconds and nanoseconds
@@ -283,4 +268,29 @@ public class Punch {
 //        int adjustment = (remainder < interval / 2) ? -remainder : (interval - remainder);
 //        return time.plusMinutes(adjustment);
 //    }
+        /* This was called Test.java for some reason
+package edu.jsu.mcis.cs310.tas_sp25;
+ Shared Rounding Logic for Weekend Punches and Other Adjustments**
+        int minute = original.getMinute();
+        int remainder = minute % roundInterval;
+        int adjustment;
+
+        // Apply the rounding logic only once
+        if (remainder < roundInterval / 2) {
+            adjustment = -remainder; // Round down
+        } else {
+            adjustment = roundInterval - remainder; // Round up
+        }
+
+        // Skip Adjustment for Weekend Punches (same rounding logic)
+        if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
+            adjusted = original.plusMinutes(adjustment).withSecond(0).withNano(0);
+            adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
+            this.adjustedTimeStamp = adjusted;
+            this.adjustmentType = adjustmentType;
+            return;
+        }
+*/
+
+
 }

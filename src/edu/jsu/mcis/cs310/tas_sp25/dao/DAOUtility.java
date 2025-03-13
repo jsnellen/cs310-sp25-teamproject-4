@@ -7,6 +7,8 @@ import java.time.format.DateTimeFormatter;
 import com.github.cliftonlabs.json_simple.*;
 import edu.jsu.mcis.cs310.tas_sp25.Punch;
 import edu.jsu.mcis.cs310.tas_sp25.Shift;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -67,4 +69,32 @@ public final class DAOUtility {
         //Return the total minutes worked for the day
         return totalMinutes;
     }
+    
+    public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist){
+        // This is needed or the date and time outputs incorrectly
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
+        // Create ArrayList object to store punch data
+        ArrayList<HashMap<String, String>> jsonData = new ArrayList<>();
+        
+        // Iterate through each punch and store its data in a HashMap
+        for (Punch punch : dailypunchlist){
+            HashMap<String, String> punchData = new HashMap<>();
+            
+            // Add punch Data to HashMap
+            punchData.put("id", String.valueOf(punch.getId()));
+            punchData.put("badgeid", punch.getBadge().getId());
+            punchData.put("terminalid", String.valueOf(punch.getTerminalId()));
+            punchData.put("punchtype", punch.getEventType().toString());
+            punchData.put("adjustmenttype", punch.getAdjustmentType().toString());
+            punchData.put("originaltimestamp", punch.getOriginaltimestamp().format(formatter).toUpperCase()); 
+            punchData.put("adjustedtimestamp", punch.getAdjustedTimeStamp().format(formatter).toUpperCase());
+            
+            jsonData.add(punchData);
+        }
+        
+        return Jsoner.serialize(jsonData);
+        
+    }
+    
+    
 }
