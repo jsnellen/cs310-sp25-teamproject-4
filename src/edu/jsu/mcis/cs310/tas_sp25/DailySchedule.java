@@ -17,7 +17,7 @@ import java.util.Map;
  * 
  * @author denzel
  */
-class DailySchedule {
+public class DailySchedule {
     
     //Fields to store schedule-related properties
     private final LocalTime shiftstart; //Start time of teh shift
