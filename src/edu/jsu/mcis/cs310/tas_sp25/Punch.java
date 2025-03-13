@@ -101,17 +101,51 @@ public class Punch {
             this.adjustmentType = PunchAdjustmentType.NONE;
             return;
         }
-        // Skip Adjustment for Weekend Punches
+        
+        // Skip Adjustment for Weekend Punches (apply only rounding)
         if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
-            int remainder = original.getMinute() % roundInterval;
-            int adjustment = (remainder < roundInterval / 2) ? -remainder : (roundInterval - remainder);
-            adjusted = original.plusMinutes(adjustment);
+            // Apply rounding for weekends (skip all other adjustments)
+            int minute = original.getMinute();
+            int remainder = minute % roundInterval;
+            int adjustment = 0;
 
-            adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
-            this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);
+            if (remainder != 0) {
+                // Apply rounding logic based on remainder and roundInterval
+                if (remainder < roundInterval / 2) {
+                    adjustment = -remainder; // Round down
+                } else {
+                    adjustment = roundInterval - remainder; // Round up
+                }
+                adjusted = original.plusMinutes(adjustment).withSecond(0).withNano(0);
+                adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
+            } else {
+                // If already aligned, no rounding needed
+                adjusted = original.withSecond(0).withNano(0);
+                adjustmentType = PunchAdjustmentType.NONE;
+            }
+
+            // Set adjusted timestamp for weekends and exit
+            this.adjustedTimeStamp = adjusted;
             this.adjustmentType = adjustmentType;
             return;
         }
+
+
+
+
+
+//        // If we use adjustToNearestInterval()- ANOTHERWAY TO DO
+//        // Use adjustToNearestInterval for rounding
+//        if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
+//            adjusted = adjustToNearestInterval(original, roundInterval);
+//            adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
+//            this.adjustedTimeStamp = adjusted;
+//            this.adjustmentType = adjustmentType;
+//            return;
+//        }
+        
+        
+        
 
         // Shift Start & Stop Adjustment
         if (eventType == EventType.CLOCK_IN && punchTime.isAfter(shiftStart.minusMinutes(roundInterval)) && punchTime.isBefore(shiftStart)) {
@@ -153,16 +187,48 @@ public class Punch {
             }
         }
 
-        this.adjustmentType = adjustmentType;
-
         if (adjustmentType == PunchAdjustmentType.NONE) {
-            // Directly round using LocalDateTime.plusMinutes()
-            this.adjustedTimeStamp = original.plusMinutes(roundInterval - (original.getMinute() % roundInterval))
-                    .withSecond(0).withNano(0);
-            this.adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
-        } else {
-            this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);
+            int minute = original.getMinute();
+            int remainder = minute % roundInterval;
+            int adjustment = 0;
+
+            if (remainder != 0) {
+                // Apply rounding logic based on remainder and roundInterval
+                if (remainder < roundInterval / 2) {
+                    adjustment = -remainder; // Round down
+                } else {
+                    adjustment = roundInterval - remainder; // Round up
+                }
+                adjusted = original.plusMinutes(adjustment).withSecond(0).withNano(0);
+                adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
+            } else {
+                // If already aligned, no rounding needed
+                adjusted = original.withSecond(0).withNano(0);
+                adjustmentType = PunchAdjustmentType.NONE;
+            }
         }
+        this.adjustmentType = adjustmentType;
+        this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);
+
+
+
+
+//   ANOTHER METHOD WE CAN USE
+//        this.adjustmentType = adjustmentType;
+//
+//        // Use plusMinutes() for rounding if none of the above adjustments are made
+//        if (adjustmentType == PunchAdjustmentType.NONE) {
+//            if (original.getMinute() % roundInterval == 0) {
+//                //If already aligned with the interval, keep it as NONE
+//                this.adjustedTimeStamp = original.withSecond(0).withNano(0);
+//            } else {
+//                //apply interval rounding
+//                this.adjustedTimeStamp = adjustToNearestInterval(original, roundInterval);
+//                this.adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
+//            }
+//        } else {
+//            this.adjustedTimeStamp = adjusted; //We can also use "this.adjustedTimeStamp = adjusted.withSecond(0).withNano(0);"
+//        }
 
     }
 
@@ -197,10 +263,15 @@ public class Punch {
         return sb.toString();
     }
 
-    //Rounds the punch timestamp to the nearest interval.
+    
+    
+    
+// ANOTHER WAY TO DO - We can use adjustToNearestInterval()
+    
+//// Adjusts the timestamp to the nearest interval
 //    private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval) {
+//        // Remove seconds and nanoseconds
 //        time = time.withSecond(0).withNano(0); // Remove seconds/nanoseconds
-//
 //        int minute = time.getMinute();
 //        int remainder = minute % interval;
 //
@@ -208,19 +279,8 @@ public class Punch {
 //            return time; // Already aligned, no change needed
 //        }
 //
-//        int roundedMinute;
-//
-//        if (remainder < interval / 2) {
-//            roundedMinute = minute - remainder; // Round down
-//        } else {
-//            roundedMinute = minute + (interval - remainder); // Round up
-//        }
-//
-//        // Prevent "Minute 60" overflow
-//        if (roundedMinute >= 60) {
-//            return time.plusHours(1).withMinute(0);
-//        } else {
-//            return time.withMinute(roundedMinute);
-//        }
+//        // Round up or down based on remainder
+//        int adjustment = (remainder < interval / 2) ? -remainder : (interval - remainder);
+//        return time.plusMinutes(adjustment);
 //    }
 }
