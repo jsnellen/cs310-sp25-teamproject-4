@@ -33,11 +33,18 @@ public final class DAOUtility {
     
         int totalMinutes = 0; //Initialize the total minutes worked
         boolean isClockedIn = false; //Track whether the employee is currently clocked in
+        
         LocalTime clockInTime = null; //Store the time of the most recent clock in punch
+        LocalTime clockOutTime = null; // Store the time of the most recent clock out punch
+        
         int lunchDuration = shift.getLunchDuration(); //Duration of the lunch break in minutes
         int lunchThreshold = shift.getLunchThreshold(); //Minimum minutes required to deduct lunch
         
-        //Iteraye through the list of punchs
+        LocalTime lunchStart = shift.getLunchStart(); // Lunch starts
+        LocalTime lunchStop = shift.getLunchStop(); // Lunch ends
+
+        
+        //Iterate through the list of punches
         for (Punch punch : dailyPunchList) {
             switch (punch.getEventType()) {
                 case CLOCK_IN -> {
@@ -50,24 +57,28 @@ public final class DAOUtility {
                 case CLOCK_OUT -> {
                     //If the employee is clocked in, calculate the time worked since the last clock in
                     if (isClockedIn) {
-                        LocalTime clockOutTime = punch.getAdjustedTimeStamp().toLocalTime(); //Get adjusted time
-                        long minutesWorked = ChronoUnit.MINUTES.between(clockInTime, clockOutTime);
-                        totalMinutes += (int) minutesWorked; //Add duration to total minutes
-                        isClockedIn = false; //Marks employee ascloked out
+                        clockOutTime = punch.getAdjustedTimeStamp().toLocalTime(); // Get adjusted clock out time
+                        
+                        // Calculates minutes worked between clock in and clock out
+                        totalMinutes += ChronoUnit.MINUTES.between(clockInTime, clockOutTime);
+                        
+                        isClockedIn = false; //Marks employee as clocked out
                     }
                 }
-                case TIME_OUT -> //Ignore time between CLOCK_IN and TIME_OUT
-                    isClockedIn = false;
             }
         }
         
         //Deduct lunch break if the total minutes worked exceed the lunch threshold
         if (totalMinutes > lunchThreshold) {
-            totalMinutes -= lunchDuration; //Subtract the lunch duration from the total
-        }
-        
-        //Return the total minutes worked for the day
-        return totalMinutes;
+            // Ensures clock in and clock out times exist before checking for lunch deduction
+            if (clockInTime != null && clockOutTime != null){
+                // Deduct lunch only if the employee worked through lunch
+                if (clockInTime.isBefore(lunchStart)&& clockOutTime.isAfter(lunchStop)){
+                    totalMinutes -= lunchDuration;
+                }
+            }
+        }   
+    return totalMinutes;
     }
     
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist){
