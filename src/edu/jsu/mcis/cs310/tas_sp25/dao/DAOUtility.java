@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import com.github.cliftonlabs.json_simple.*;
 import edu.jsu.mcis.cs310.tas_sp25.Punch;
 import edu.jsu.mcis.cs310.tas_sp25.Shift;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -105,6 +106,13 @@ public final class DAOUtility {
         
         return Jsoner.serialize(jsonData);
         
+    }
+    
+    public static BigDecimal calculateAbsenteeism(ArrayList<Punch> punchlist, Shift s){
+        
+        BigDecimal resultPercentage = null;
+        
+        return resultPercentage;
     }
     
     
