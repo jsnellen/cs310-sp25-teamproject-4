@@ -17,8 +17,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 /**
  *
@@ -33,16 +35,20 @@ public class AbsenteeismDAO {
     }
     
     private static final String Query_FIND = "SELECT * FROM absenteeism WHERE employeeid = ? AND payperiod = ?";
-    private static final String Query_INSERT = "INSERT INTO absenteeism (employeeid, payperiod, percentage) VALUES (?,?,?)";
+    private static final String Query_INSERT = "INSERT INTO absenteeism (employeeid, payperiod, percentage) VALUES (?,?,?)" 
+                                                + "ON DUPLICATE KEY UPDATE percentage = ?";
     
     public Absenteeism find(Employee employee, LocalDate payPeriodStartDate){
         
         Absenteeism resultAbsenteesim = null;
         
+        LocalDate adjustedPayPeriodStartDate = payPeriodStartDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        
         PreparedStatement ps = null;
         ResultSet rs = null;
         
         try {
+            
             Connection conn = daoFactory.getConnection();
             
             int employeeID = employee.getId();
@@ -61,16 +67,16 @@ public class AbsenteeismDAO {
                     // Getting result set and storing it in the ResultSet variable
                     rs = ps.getResultSet();
                     
-                    BigDecimal absenteeismPercentage = rs.getBigDecimal("percentage");
+                    while(rs.next()){
+                        
+                        BigDecimal absenteeismPercentage = rs.getBigDecimal("percentage");
                     
-                    resultAbsenteesim = new Absenteeism(employee, payPeriodStartDate, absenteeismPercentage);
-                    
+                        resultAbsenteesim = new Absenteeism(employee, adjustedPayPeriodStartDate, absenteeismPercentage);
+                    } 
                 }
-                
             }
         }
         
-    
         catch (Exception e) { e.printStackTrace(); }
         
         finally {
@@ -105,6 +111,8 @@ public class AbsenteeismDAO {
                 ps.setInt(1, employeeID);
                 ps.setDate(2, java.sql.Date.valueOf(date));
                 ps.setBigDecimal(3, percentage);
+                
+                ps.setBigDecimal(4, percentage);
                 
                 int rowsAffected = ps.executeUpdate();
 
