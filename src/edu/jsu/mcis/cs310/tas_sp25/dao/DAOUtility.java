@@ -113,28 +113,11 @@ public final class DAOUtility {
         int totalMinutesWorked = calculateTotalMinutes(punchlist, s);
         
         int scheduledMinutesToWork = 0;
-        
-        ArrayList<LocalDate> dateList = new ArrayList<>();
-         
-        for (Punch punch: punchlist){
-            
-            LocalDate date = punch.getOriginalTimeStamp().toLocalDate();
-            
-            System.out.println(date);
-            
-            if (!dateList.contains(date)) {
-                
-                dateList.add(date); 
-                
-                scheduledMinutesToWork += s.getShiftDuration() - s.getLunchDuration();
-                
-                System.out.println(s.getShiftDuration());
-                
-            }
-        }
-        
-        System.out.println(scheduledMinutesToWork);
-        System.out.println(totalMinutesWorked);
+
+        scheduledMinutesToWork += 5 * (s.getShiftDuration() - s.getLunchDuration());
+
+        System.out.println("Scheduled Work: " + scheduledMinutesToWork);
+        System.out.println("Minutes Worked: " + totalMinutesWorked);
         double resultPercentage = 100.0 * (scheduledMinutesToWork - totalMinutesWorked) / scheduledMinutesToWork;
         
         System.out.println(resultPercentage);

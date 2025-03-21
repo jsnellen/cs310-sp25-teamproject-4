@@ -146,7 +146,7 @@ public class AbsenteeismTest {
         
         for (Punch punch : punchlist) {
             punch.adjust(s);
-            //System.err.println(punch.printAdjusted());
+            System.err.println(punch.printAdjusted());
         }
         
         /* Compute Pay Period Total Absenteeism */
@@ -161,7 +161,7 @@ public class AbsenteeismTest {
         /* Retrieve Absenteeism From Database */
         
         Absenteeism a2 = absenteeismDAO.find(e, ts);
-        
+
         /* Compare to Expected Value */
         
         assertEquals("#08D01475 (Pay Period Starting 09-16-2018): -28.75%", a2.toString());
