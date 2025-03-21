@@ -76,8 +76,6 @@ public class PunchList_IntervalTest {
             s2.append("\n");
         }
 
-        System.out.println("Expected: \n" + s2.toString());
-        System.out.println("Actual: \n" + s1.toString());
         /* Compare Output Strings */
         
         assertEquals(s2.toString(), s1.toString());

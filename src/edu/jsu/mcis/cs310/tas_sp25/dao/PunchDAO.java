@@ -35,7 +35,7 @@ public class PunchDAO {
     
     private static final String Query_LIST_BETWEEN = "SELECT * FROM event WHERE badgeid = ? and DATE(timestamp) BETWEEN ? AND ? ORDER BY timestamp ASC"; 
     
-    public final DAOFactory daoFactory;
+    private final DAOFactory daoFactory;
     
     PunchDAO(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
@@ -323,8 +323,6 @@ public class PunchDAO {
                         
                         //Getting the eventType and mapping it to the EventType enum
                         EventType fdEventType = EventType.values()[fdEventTypeId];             
-                        
-                        System.out.println(fdEventType);
                         
                         // if eventType is CLOCK_OUT or TIME_OUT, creating a new punch and adding it to the end of the ArrayList
                         if(fdEventType == EventType.CLOCK_OUT || fdEventType == EventType.TIME_OUT){
