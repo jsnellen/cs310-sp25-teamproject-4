@@ -146,7 +146,6 @@ public class AbsenteeismTest {
         
         for (Punch punch : punchlist) {
             punch.adjust(s);
-            System.err.println(punch.printAdjusted());
         }
         
         /* Compute Pay Period Total Absenteeism */

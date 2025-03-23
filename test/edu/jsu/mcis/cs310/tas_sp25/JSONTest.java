@@ -49,6 +49,8 @@ public class JSONTest {
             ArrayList<HashMap<String, String>> actual = (ArrayList) Jsoner.deserialize(actualJSON);
 
             /* Compare to Expected JSON */
+            System.out.println("1.)" + expected.toString());
+            System.out.println("2.)" + actual.toString());
             assertEquals(expected, actual);
 
         }

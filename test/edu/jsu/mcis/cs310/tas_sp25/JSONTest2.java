@@ -66,7 +66,6 @@ public class JSONTest2 {
             JsonObject actual = (JsonObject)(Jsoner.deserialize(actualJSON));
 
             /* Compare to Expected JSON */
-
             assertEquals(expected, actual);
             
         }
@@ -118,7 +117,6 @@ public class JSONTest2 {
             JsonObject actual = (JsonObject)(Jsoner.deserialize(actualJSON));
 
             /* Compare to Expected JSON */
-
             assertEquals(expected, actual);
             
         }
@@ -170,7 +168,6 @@ public class JSONTest2 {
             JsonObject actual = (JsonObject)Jsoner.deserialize(actualJSON);
 
             /* Compare to Expected JSON */
-
             assertEquals(expected, actual);
 
         }
