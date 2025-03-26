@@ -33,12 +33,12 @@ public final class DAOUtility {
      * @return The total number of minutes accrued by the employee for the day.
      */
     //Author: Evan Ranjitkar
-    //Editied Method: Tanner Thomas, Cole Stephens
+    //Editied Method: Tanner Thomas, cStephens
     public static int calculateTotalMinutes(ArrayList<Punch> dailyPunchList, Shift shift) {
     
         int totalMinutes = 0; //Initialize the total minutes worked
         
-        //Groups a list of punch objects ~Cole Stephens
+        //Groups a list of punch objects ~cStephens
         Map<LocalDate, List<Punch>> punchesByDay = dailyPunchList.stream()
                 .collect(Collectors.groupingBy(p -> p.getAdjustedTimeStamp().toLocalDate()));
         
@@ -76,7 +76,7 @@ public final class DAOUtility {
                 }
             }
             
-            //Deduct lunch if applicable ~Tanner Thomas, Edited by: Cole Stephens
+            //Deduct lunch if applicable ~Tanner Thomas, Edited by: cStephens
             if (dailyMinutes > lunchThreshold && clockInTime != null && clockOutTime != null) {
                 if (clockInTime.isBefore(lunchStart) && clockOutTime.isAfter(lunchStop)) {
                     dailyMinutes -= lunchDuration;
@@ -94,11 +94,11 @@ public final class DAOUtility {
         // This is needed or the date and time outputs incorrectly
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
         // Create ArrayList object to store punch data
-        ArrayList<HashMap<String, String>> jsonData = new ArrayList<>();
+        List<Map<String, String>> jsonData = new ArrayList<>();
         
         // Iterate through each punch and store its data in a HashMap
         for (Punch punch : dailypunchlist){
-            HashMap<String, String> punchData = new HashMap<>();
+            Map<String, String> punchData = new LinkedHashMap<>();
             
             // Add punch Data to HashMap
             punchData.put("id", String.valueOf(punch.getId()));
@@ -124,10 +124,18 @@ public final class DAOUtility {
         int scheduledMinutesToWork = 0;
 
         scheduledMinutesToWork += 5 * (s.getShiftDuration() - s.getLunchDuration());
+        
+        //Tests to see if the value equals 0, then returns a 0 with two decimal places. ~cStephens
+        if (scheduledMinutesToWork == 0) {
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        }
 
         double resultPercentage = 100.0 * (scheduledMinutesToWork - totalMinutesWorked) / scheduledMinutesToWork;
         
-        return BigDecimal.valueOf(resultPercentage);
+        //Added to round the result to two decimal places. ~cStephens
+        BigDecimal absenteeism = BigDecimal.valueOf(resultPercentage).setScale(2, RoundingMode.HALF_UP);
+        
+        return absenteeism;
     }
     
     /*
@@ -136,7 +144,7 @@ public final class DAOUtility {
     This method should iterate through this list, copy the data for each punch into a nested data structure, encode 
     this structure as a JSON string, and return this string to the caller. 
     */
-    public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift shift) {
+    public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
         
         //Gets the punchListAsJSON method
         String punchListJSON = getPunchListAsJSON(punchlist);
@@ -145,8 +153,8 @@ public final class DAOUtility {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
         
         //Variables for the TotalMinutes and absenteeism. 
-        int totalMinutes = calculateTotalMinutes(punchlist, shift);
-        BigDecimal absenteeism = calculateAbsenteeism(punchlist, shift).setScale(2, BigDecimal.ROUND_HALF_UP);
+        int totalMinutes = calculateTotalMinutes(punchlist, s);
+        BigDecimal absenteeism = calculateAbsenteeism(punchlist, s);
         
         //Adds a new Punch Data Set
         JsonArray punchArray = new JsonArray();
@@ -163,15 +171,12 @@ public final class DAOUtility {
             punchArray.add(punchData2);
         }
         
-        //Serializes the new Data to JSON
-        String serializedPunchArray = punchArray.toString();
-        
         //Adds the punchlist method along with the new totalminutes and abensteeism punches.
-        HashMap<String, String> punchTotals = new HashMap<>();
+        HashMap<String, Object> punchTotals = new HashMap<>();
         
-        punchTotals.put("absenteeism", absenteeism.toString() + "%");
-        punchTotals.put("totalminutes", String.valueOf(totalMinutes));
-        punchTotals.put("punchlist", serializedPunchArray);
+        punchTotals.put("absenteeism", String.format("%.2f%%", absenteeism));
+        punchTotals.put("totalminutes", totalMinutes);
+        punchTotals.put("punchlist", punchArray);
         
         //Returns punchTotals
         return Jsoner.serialize(punchTotals);
