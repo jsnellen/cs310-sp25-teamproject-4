@@ -16,7 +16,8 @@ import java.util.*;
 public class ShiftDAO {
 
     // Define a SQL query to find a shift by its ID
-    private static final String QUERY_FIND_SHIFT = "SELECT * FROM shift WHERE id = ?";
+    private static final String QUERY_FIND_SHIFT = "SELECT s.id, s.description, d.shiftstart, d.shiftstop, d.roundinterval, d.graceperiod, d.dockpenalty, d.lunchstart, d.lunchstop, d.lunchthreshold " +
+    "FROM shift s JOIN dailyschedule d ON s.dailyscheduleid = d.id WHERE s.id = ?";
     
     // Define a SQL query to find an employee by their badge ID
     private static final String QUERY_FIND_EMPLOYEE = "SELECT * FROM employee WHERE badgeid =?";
@@ -99,21 +100,25 @@ public class ShiftDAO {
      */
     private Shift mapResultSetToShift(ResultSet resultSet) throws SQLException {
         HashMap<String, Object> shiftData = new HashMap<>();
+        HashMap<String, String> scheduleMap = new HashMap<>();
 
         // Populate the HashMap with data from the ResultSet
         shiftData.put("shiftid", resultSet.getInt("id"));
         shiftData.put("description", resultSet.getString("description"));
-        shiftData.put("shiftstart", resultSet.getObject("shiftstart", LocalTime.class));
-        shiftData.put("shiftstop", resultSet.getObject("shiftstop", LocalTime.class));
-        shiftData.put("roundinterval", resultSet.getInt("roundinterval"));
-        shiftData.put("graceperiod", resultSet.getInt("graceperiod"));
-        shiftData.put("dockpenalty", resultSet.getInt("dockpenalty"));
-        shiftData.put("lunchstart", resultSet.getObject("lunchstart", LocalTime.class));
-        shiftData.put("lunchstop", resultSet.getObject("lunchstop", LocalTime.class));
-        shiftData.put("lunchthreshold", resultSet.getInt("lunchthreshold"));
+        
+        scheduleMap.put("shiftstart", resultSet.getString("shiftstart"));
+        scheduleMap.put("shiftstop", resultSet.getString("shiftstop"));
+        scheduleMap.put("roundinterval", String.valueOf(resultSet.getInt("roundinterval")));
+        scheduleMap.put("graceperiod", String.valueOf(resultSet.getInt("graceperiod")));
+        scheduleMap.put("dockpenalty", String.valueOf(resultSet.getInt("dockpenalty")));
+        scheduleMap.put("lunchstart", resultSet.getString("lunchstart"));
+        scheduleMap.put("lunchstop", resultSet.getString("lunchstop"));
+        scheduleMap.put("lunchthreshold", String.valueOf(resultSet.getInt("lunchthreshold")));
+        
+        DailySchedule schedule = new DailySchedule(scheduleMap);
 
         // Create and return a new Shift object using the HashMap
-        return new Shift(shiftData);
+        return new Shift(shiftData, schedule);
         
     }
     
