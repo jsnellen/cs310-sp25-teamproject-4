@@ -121,6 +121,10 @@ public class Punch {
     public PunchAdjustmentType getAdjustmentType() {
         return this.adjustmentType;
     }
+    
+    public LocalDateTime getOriginaltimestamp() {
+        return originalTimeStamp;
+    }
 
      /**
      * Adjusts the shift duration
