@@ -49,24 +49,31 @@ public class DepartmentDAO {
             
             if(conn.isValid(0)){
             
+            //Creating the query as a PreparedStatement
             stmt = conn.prepareStatement(QUERY_FIND_DEPARTMENT);
+            
+            // Providing the arguments for the PreparedStatement
             stmt.setInt(1, departmentId);
 
+            // if ResultSet is valid, then procees
             try (ResultSet result_Set = stmt.executeQuery()) {
+                
+                // looping through the ResultSet
                 if (result_Set.next()) {
+                    
+                    // Returning a new Department object with the data from the ResultSet
                     return new Department(
                         departmentId,
                         result_Set.getString("description"),
                         result_Set.getInt("terminalid")
                     );
                 }
-            }
-            }
+              }
+           }
             
         } catch (SQLException e) {
-            throw new DAOException(e.getMessage());
-        }
-
+                throw new DAOException(e.getMessage());
+            }
         return null;
     }
 }

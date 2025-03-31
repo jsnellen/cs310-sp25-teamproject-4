@@ -23,7 +23,15 @@ public class Punch {
     private LocalDateTime adjustedTimeStamp;
     private PunchAdjustmentType adjustmentType;
 
-    // First Constructor
+   
+    /**
+     * First Constructor for Punch class
+     * 
+     * @param terminalId The terminalid used for the punch
+     * @param badge The badge object for the Punch instance
+     * @param eventType The type of event
+     */
+    
     public Punch(int terminalId, Badge badge, EventType eventType) {
         this.terminalId = terminalId;
         this.badge = badge;
@@ -31,7 +39,15 @@ public class Punch {
         this.originalTimeStamp = LocalDateTime.now().withSecond(0).withNano(0);
     }
 
-    // Second Constructor
+    /**
+     * Second Constructor for Punch class
+     * 
+     * @param id the id used for the punch
+     * @param terminalId The terminalid used for the punch
+     * @param badge The badge object for the Punch instance
+     * @param originaltimestamp The timestamp for the Punch
+     * @param eventType The type of event
+     */
     public Punch(int id, int terminalId, Badge badge, LocalDateTime originaltimestamp, EventType eventType) {
         this.id = id;
         this.terminalId = terminalId;
@@ -41,39 +57,76 @@ public class Punch {
     }
 
     // Getter Methods
+    
+     /**
+     * Returns the id
+     *
+     * @return id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Returns the terminalId
+     *
+     * @return terminalId
+     */
     public int getTerminalId() {
         return terminalId;
     }
 
+    /**
+     * Returns the badge object for the punch
+     *
+     * @return badge
+     */
     public Badge getBadge() {
         return badge;
     }
 
+    /**
+     * Returns the event type
+     *
+     * @return eventType
+     */
     public EventType getEventType() {
         return eventType;
     }
 
+    /**
+     * Returns the original time stamp for the punch
+     *
+     * @return originalTimeStamp
+     */
     public LocalDateTime getOriginalTimeStamp() {
         return originalTimeStamp;
     }
 
+    /**
+     * Returns the adjusted time stamp for the punch
+     *
+     * @return adjustedTimeStamp
+     */
     public LocalDateTime getAdjustedTimeStamp() {
         return adjustedTimeStamp;
     }
 
     //This is for DAOUtility.java  
+    /**
+     * Returns the adjustment type
+     *
+     * @return adjustmentType
+     */
     public PunchAdjustmentType getAdjustmentType() {
         return this.adjustmentType;
     }
 
-    public LocalDateTime getOriginaltimestamp() {
-        return originalTimeStamp;
-    }
-
+     /**
+     * Adjusts the shift duration
+     *
+     * @param s The shift object for the punch instance
+     */
     public void adjust(Shift s) {
         // Store the original timestamp for the punch
         LocalDateTime original = this.originalTimeStamp;
@@ -221,6 +274,11 @@ public class Punch {
     }
 
     // Print methods
+    /**
+     * Prints the punch description
+     *
+     * @return the punch with the original timestamp
+     */
     public String printOriginal() {
 
         // The pringOriginal method shoud return a String in the following format
@@ -239,6 +297,11 @@ public class Punch {
         return stringBuilderResult.toString();
     }
 
+    /**
+     * Prints the punch description
+     *
+     * @return the punch with the adjusted timestamp
+     */
     public String printAdjusted() {
         DateTimeFormatter timeStampFormat = DateTimeFormatter.ofPattern("EEE MM/dd/uuuu HH:mm:ss");
 

@@ -38,6 +38,11 @@ public class AbsenteeismDAO {
     private static final String Query_INSERT = "INSERT INTO absenteeism (employeeid, payperiod, percentage) VALUES (?,?,?)" 
                                                 + "ON DUPLICATE KEY UPDATE percentage = ?";
     
+    /**
+         * Finds an Absenteeism record from the database 
+         * @param employee The employee object for the absenteeism instance
+         * @param payPeriodStartDate The LocalDate object for the payPeriodStartDate for the absenteeism calculation
+    */
     public Absenteeism find(Employee employee, LocalDate payPeriodStartDate){
         
         Absenteeism resultAbsenteesim = null;
@@ -90,6 +95,10 @@ public class AbsenteeismDAO {
         
     }
     
+     /**
+         * Creates an Absenteeism record in the database 
+         * @param absenteeismObject The Absenteeism object for the absenteeism instance
+    */
     public void create(Absenteeism absenteeismObject){
 
         PreparedStatement ps = null;
