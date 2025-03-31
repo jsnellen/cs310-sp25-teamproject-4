@@ -28,7 +28,6 @@ public class PunchFindTest {
 
         /* Compare to Expected Values */
         
-        System.out.println(p1.printOriginal());
         assertEquals("#D2C39273 CLOCK IN: WED 09/05/2018 07:00:07", p1.printOriginal());
         assertEquals("#DFD9BB5C CLOCK IN: TUE 09/04/2018 08:00:00", p2.printOriginal());
         assertEquals("#99F0C0FA CLOCK IN: SAT 08/18/2018 06:00:00", p3.printOriginal());

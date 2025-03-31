@@ -15,6 +15,10 @@ public class BadgeDAO {
 
     }
 
+    /**
+         * Finds a badge from the database 
+         * @param id The id for the badge
+    */
     public Badge find(String id) {
 
         Badge badge = null;

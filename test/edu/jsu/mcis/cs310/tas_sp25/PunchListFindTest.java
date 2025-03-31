@@ -216,8 +216,6 @@ public class PunchListFindTest {
             s2.append("\n");
         }
 
-        System.out.println("Expected: " + s2.toString());
-        System.out.println("Actual: " + s1.toString());
         /* Compare Output Strings */
         
         assertEquals(s2.toString(), s1.toString());

@@ -35,13 +35,16 @@ public class PunchDAO {
     
     private static final String Query_LIST_BETWEEN = "SELECT * FROM event WHERE badgeid = ? and DATE(timestamp) BETWEEN ? AND ? ORDER BY timestamp ASC"; 
     
-    public final DAOFactory daoFactory;
+    private final DAOFactory daoFactory;
     
     PunchDAO(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
     
-    // find method to find a punch event from the event table
+    /**
+         * Finds a punch event from the event table
+         * @param id The id for the event
+    */
     public Punch find (int id){
         
         // Declaring a varible of type Punch to store the result Punch
@@ -121,6 +124,10 @@ public class PunchDAO {
         return resultPunch;
     }
     
+    /**
+         * Creates a punch event in the event table
+         * @param punchObject Punch object for the event instance
+    */
     public int create(Punch punchObject){
        
         int resultId = 0;
@@ -213,10 +220,11 @@ public class PunchDAO {
         
     }
     
-    
-    // Should return an ArrayList of Punch objects
-    // Should take Badge object and LocalDate as arguments
-    
+     /**
+         * Finds and lists all punch event for a single day
+         * @param badge Badge object for the event instance
+         * @param date LocalDate for the getting the punches from that day
+    */
     public ArrayList<Punch> list(Badge badge, LocalDate date){
         
         // Initializing an ArrayList to store the results
@@ -324,8 +332,6 @@ public class PunchDAO {
                         //Getting the eventType and mapping it to the EventType enum
                         EventType fdEventType = EventType.values()[fdEventTypeId];             
                         
-                        System.out.println(fdEventType);
-                        
                         // if eventType is CLOCK_OUT or TIME_OUT, creating a new punch and adding it to the end of the ArrayList
                         if(fdEventType == EventType.CLOCK_OUT || fdEventType == EventType.TIME_OUT){
                         
@@ -353,6 +359,12 @@ public class PunchDAO {
         return punchList;
     }
     
+     /**
+         * Finds and lists all punch event for the given date range
+         * @param badge Badge object for the event instance
+         * @param begin LocalDate which marks the beginning date
+         * @param end LocalDate which marks the ending date
+    */
     public ArrayList<Punch> list(Badge badge, LocalDate begin, LocalDate end){
     
          // Initializing an ArrayList to store the results
