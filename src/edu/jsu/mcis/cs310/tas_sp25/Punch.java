@@ -27,7 +27,7 @@ public class Punch {
     /**
      * First Constructor for Punch class
      * 
-     * @param terminalId The terminalid used for the punch
+     * @param terminalId The terminalId used for the punch
      * @param badge The badge object for the Punch instance
      * @param eventType The type of event
      */
@@ -43,7 +43,7 @@ public class Punch {
      * Second Constructor for Punch class
      * 
      * @param id the id used for the punch
-     * @param terminalId The terminalid used for the punch
+     * @param terminalId The terminalId used for the punch
      * @param badge The badge object for the Punch instance
      * @param originaltimestamp The timestamp for the Punch
      * @param eventType The type of event
@@ -138,19 +138,22 @@ public class Punch {
         LocalDateTime adjusted = original;
         // Default adjustment is NONE
         PunchAdjustmentType adjustmentType = PunchAdjustmentType.NONE;
+        
+        DayOfWeek day = original.getDayOfWeek();
+        DailySchedule schedule = s.getDailySchedule(day);
 
         // Shift Parameters
-        LocalTime shiftStart = s.getShiftStart();
-        LocalTime shiftStop = s.getShiftStop();
-        LocalTime lunchStart = s.getLunchStart();
-        LocalTime lunchStop = s.getLunchStop();
-        int roundInterval = s.getRoundInterval();
-        int gracePeriod = s.getGracePeriod();
-        int dockPenalty = s.getDockPenalty();
+        LocalTime shiftStart = schedule.getShiftstart();
+        LocalTime shiftStop = schedule.getShiftstop();
+        LocalTime lunchStart = schedule.getLunchstart();
+        LocalTime lunchStop = schedule.getLunchstop();
+        int roundInterval = schedule.getRoundInterval();
+        int gracePeriod = schedule.getGracePeriod();
+        int dockPenalty = schedule.getDockpenalty();
 
         // Converting timestamps to LocalTime
         LocalTime punchTime = original.toLocalTime();
-        DayOfWeek day = original.getDayOfWeek();
+        
 
         // Skipping adjustments for Time out punches
         if (eventType == EventType.TIME_OUT) {

@@ -3,6 +3,7 @@ package edu.jsu.mcis.cs310.tas_sp25;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.time.Duration;
+import java.time.DayOfWeek;
 
 /**
  *
@@ -29,7 +30,17 @@ public class Shift {
         for (int i = 1; i <= 5; i++) {
             dailySchedules.put(i, schedule);
         }
-
+    }
+    
+    public Shift(Shift other){
+        this.shift_id = other.shift_id;
+        this.description = other.description;
+        this.defaultSchedule = other.defaultSchedule;
+        this.dailySchedules = new HashMap<>();
+        
+        for (int i =1; i <=5; i++){
+            this.dailySchedules.put(i, other.getDailySchedule(i));
+        }
     }
 
     //Getters methods for accessing shift properties    
@@ -87,6 +98,16 @@ public class Shift {
 
     public DailySchedule getDailySchedule(int dayOfWeek) {
         return dailySchedules.getOrDefault(dayOfWeek, defaultSchedule);
+    }
+    
+    // Overloaded method DayofWeek
+    public DailySchedule getDailySchedule(DayOfWeek day) {
+        return dailySchedules.getOrDefault(day.getValue(), defaultSchedule);
+    }
+    
+    // Setter to apply schedule overrides
+    public void setDailySchedule(DayOfWeek day, DailySchedule schedule) {
+        dailySchedules.put(day.getValue(), schedule);
     }
 
     /**
