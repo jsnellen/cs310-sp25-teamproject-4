@@ -42,5 +42,4 @@ public class Badge {
         return String.format("%08X", checksum);
     }
 
-
 }

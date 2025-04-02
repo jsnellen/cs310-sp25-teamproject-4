@@ -53,26 +53,41 @@ public class Version2_BadgeCreateDeleteTest {
     }
     
     @Test
+    public void testCreateBadge3() {
+
+        /* Create Badges */
+
+        Badge b3 = new Badge("Chris, Helms");
+
+        /* Compare Badge to Expected Value */
+        
+        assertEquals("#C5C46574 (Chris, Helms)", b3.toString());
+
+    }
+    
+    
+    
+    @Test
     public void testDeleteBadge1() {
         
         BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
 
         /* Create New Badge Object */
 
-        Badge b = new Badge("Haney, Debra F");
+        Badge b4 = new Badge("Haney, Debra F");
         
         /* Insert New Badge (delete first in case badge already exists) */
         
-        badgeDAO.delete(b.getId());
-        badgeDAO.create(b);
+        badgeDAO.delete(b4.getId());
+        badgeDAO.create(b4);
         
         /* Delete New Badge */
         
-        boolean result = badgeDAO.delete(b.getId());
+        boolean result = badgeDAO.delete(b4.getId());
 
         /* Compare Badge to Expected Value */
         
-        assertEquals("#8EA649AD (Haney, Debra F)", b.toString());
+        assertEquals("#8EA649AD (Haney, Debra F)", b4.toString());
         
         /* Check Deletion Result */
         
@@ -80,4 +95,34 @@ public class Version2_BadgeCreateDeleteTest {
 
     }
     
+    @Test
+    public void testDeleteBadge2() {
+        
+        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
+
+        /* Create New Badge Object */
+
+        Badge b5 = new Badge("Chris, Helms");
+        
+        /* Insert New Badge (delete first in case badge already exists) */
+        
+        badgeDAO.create(b5);
+        
+        /* Delete New Badge */
+        
+        boolean result = badgeDAO.delete(b5.getId());
+
+        /* Compare Badge to Expected Value */
+        
+        assertEquals("#C5C46574 (Chris, Helms)", b5.toString());
+        
+        /* Check Deletion Result */
+        
+        assertEquals(true, result);
+
+    }
 }
+
+
+    
+

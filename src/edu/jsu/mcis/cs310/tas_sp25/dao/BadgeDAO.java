@@ -6,9 +6,9 @@ import java.sql.*;
 public class BadgeDAO {
 
     private static final String QUERY_FIND = "SELECT * FROM badge WHERE id = ?";
-    private static final String QUERY_CREATE = "INSERT INTO badge () VALUES ";
+    private static final String QUERY_CREATE = "INSERT INTO badge (id, description) VALUES (?, ?) ";
     private static final String QUERY_UPDATE = " ";
-    private static final String QUERY_DELETE = " ";
+    private static final String QUERY_DELETE = "DELETE FROM badge WHERE id = ?";
 
     private final DAOFactory daoFactory;
 
@@ -87,19 +87,30 @@ public class BadgeDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         
+        // Creating a new badge with the description only constructor
+        // The constructor will create a new badge id for the new badge
+        Badge newBadge = new Badge(badge.getDescription());
+        
         try {
             Connection conn = daoFactory.getConnection();
             
              if (conn.isValid(0)) {
 
+                //Creating the query as a PreparedStatement
                 ps = conn.prepareStatement(QUERY_CREATE);
                 
-                 int rowsAffected = ps.executeUpdate();
+                // Providing the arguments for the PreparedStatement
+                ps.setString(1, newBadge.getId());
+                ps.setString(2, newBadge.getDescription());
                 
-                // If an error occurs during insertion, then returning 0
+                // Executing the query and executeUpdate() returns the number of
+                // row affected by the query so storing it in an int variable
+                int rowsAffected = ps.executeUpdate();
+                
+                 // if the delete was successful, then return true
                 if (rowsAffected == 1){
                     return true;
-                }
+                } else return false;
 
             }
             
@@ -125,6 +136,7 @@ public class BadgeDAO {
             }
         }
         
+        // Default return false
         return false;
     }
     
@@ -140,12 +152,11 @@ public class BadgeDAO {
 
                 ps = conn.prepareStatement(QUERY_UPDATE);
                 
-                 int rowsAffected = ps.executeUpdate();
+                int rowsAffected = ps.executeUpdate();
                 
-                // If an error occurs during insertion, then returning 0
                 if (rowsAffected == 1){
                     return true;
-                }
+                } else return false;
 
             }
             
@@ -175,7 +186,7 @@ public class BadgeDAO {
         
     }
     
-     public boolean delete(Badge badge){
+     public boolean delete(String id){
         
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -185,14 +196,20 @@ public class BadgeDAO {
             
              if (conn.isValid(0)) {
 
+                //Creating the query as a PreparedStatement
                 ps = conn.prepareStatement(QUERY_DELETE);
                 
-                 int rowsAffected = ps.executeUpdate();
+                // Providing the arguments for the PreparedStatement
+                ps.setString(1, id);
                 
-                // If an error occurs during insertion, then returning 0
+                // Executing the query and executeUpdate() returns the number of
+                // row affected by the query so storing it in an int variable
+                int rowsAffected = ps.executeUpdate();
+                
+                // if the delete was successful, then return true
                 if (rowsAffected == 1){
                     return true;
-                }
+                } else return false;
 
             }
             
@@ -218,7 +235,7 @@ public class BadgeDAO {
             }
         }
         
+        // Default return false
         return false;
-        
     }
 }
