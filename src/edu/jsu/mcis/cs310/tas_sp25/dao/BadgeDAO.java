@@ -6,6 +6,9 @@ import java.sql.*;
 public class BadgeDAO {
 
     private static final String QUERY_FIND = "SELECT * FROM badge WHERE id = ?";
+    private static final String QUERY_CREATE = "INSERT INTO badge () VALUES ";
+    private static final String QUERY_UPDATE = " ";
+    private static final String QUERY_DELETE = " ";
 
     private final DAOFactory daoFactory;
 
@@ -79,4 +82,143 @@ public class BadgeDAO {
 
     }
 
+    public boolean create(Badge badge){
+       
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        try {
+            Connection conn = daoFactory.getConnection();
+            
+             if (conn.isValid(0)) {
+
+                ps = conn.prepareStatement(QUERY_CREATE);
+                
+                 int rowsAffected = ps.executeUpdate();
+                
+                // If an error occurs during insertion, then returning 0
+                if (rowsAffected == 1){
+                    return true;
+                }
+
+            }
+            
+        } catch (SQLException e) {
+
+            throw new DAOException(e.getMessage());
+
+        } finally {
+
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    public boolean update(Badge badge){
+        
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        try {
+            Connection conn = daoFactory.getConnection();
+            
+             if (conn.isValid(0)) {
+
+                ps = conn.prepareStatement(QUERY_UPDATE);
+                
+                 int rowsAffected = ps.executeUpdate();
+                
+                // If an error occurs during insertion, then returning 0
+                if (rowsAffected == 1){
+                    return true;
+                }
+
+            }
+            
+        } catch (SQLException e) {
+
+            throw new DAOException(e.getMessage());
+
+        } finally {
+
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+        }
+        
+        return false;
+        
+    }
+    
+     public boolean delete(Badge badge){
+        
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        try {
+            Connection conn = daoFactory.getConnection();
+            
+             if (conn.isValid(0)) {
+
+                ps = conn.prepareStatement(QUERY_DELETE);
+                
+                 int rowsAffected = ps.executeUpdate();
+                
+                // If an error occurs during insertion, then returning 0
+                if (rowsAffected == 1){
+                    return true;
+                }
+
+            }
+            
+        } catch (SQLException e) {
+
+            throw new DAOException(e.getMessage());
+
+        } finally {
+
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+        }
+        
+        return false;
+        
+    }
 }
