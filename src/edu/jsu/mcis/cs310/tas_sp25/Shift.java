@@ -31,15 +31,17 @@ public class Shift {
             dailySchedules.put(i, schedule);
         }
     }
-    
-    public Shift(Shift other){
-        this.shift_id = other.shift_id;
-        this.description = other.description;
-        this.defaultSchedule = other.defaultSchedule;
+    // Creates a copy of an existing Shift object, default, and daily schedules
+    // This is used to apply overrides so the original shift remains unchanged
+    public Shift(Shift original){
+        this.shift_id = original.shift_id;
+        this.description = original.description;
+        this.defaultSchedule = original.defaultSchedule;
         this.dailySchedules = new HashMap<>();
         
+        // Copy each daily schedule from the original shift into the new shift dailySchedules Map
         for (int i =1; i <=5; i++){
-            this.dailySchedules.put(i, other.getDailySchedule(i));
+            this.dailySchedules.put(i, original.getDailySchedule(i));
         }
     }
 
