@@ -34,9 +34,8 @@ public final class DAOUtility {
      * @param shift The Shift object containing shift rules (e.g., lunch
      * duration and threshold).
      * @return The total number of minutes accrued by the employee for the day.
+     * @author Denzel Stinson, Tanner Thomas, cStephens
      */
-    //Author: Evan Ranjitkar
-    //Editied Method: Tanner Thomas, cStephens
     public static int calculateTotalMinutes(ArrayList<Punch> dailyPunchList, Shift shift) {
 
         int totalMinutes = 0; //Initialize the total minutes worked
@@ -95,7 +94,13 @@ public final class DAOUtility {
         return totalMinutes;
     }
 
-    //Author: Evan Ranjitkar
+    /**
+     * 
+     * @param dailypunchlist The punch list of a day that needs to be converted
+     * @return converted json String
+     * @author Denzel Stinson
+     */
+    
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
         // This is needed or the date and time outputs incorrectly
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
@@ -122,34 +127,53 @@ public final class DAOUtility {
 
     }
 
-    //Author:Evan Ranjitkar
+    /**
+     * Calculate the absenteeism percentage 
+     * @param punchlist the punch list of a given day
+     * @param s the shift object whose absenteeism percentage needs to be calculated
+     * @return the absenteeism percentage in BigDecimal
+     * @author Evan Ranjitkar
+     */
     public static BigDecimal calculateAbsenteeism(ArrayList<Punch> punchlist, Shift s) {
 
+        // Using the calculateTotalMinutes method to calculate the total minutes worked
         int totalMinutesWorked = calculateTotalMinutes(punchlist, s);
 
+        // Initializing a variable to store the minutes scheduled to work in a week
         int scheduledMinutesToWork = 0;
 
+        // for loop to loop through the five work days
         for (int i = 1; i <= 5; i++) {
+            
+            // Using DayOfWeek library to get the day
             DayOfWeek day = DayOfWeek.of(i);
+            
+            // Using the getDailySchedule method of the shift object to get the schedule of the current day
             DailySchedule schedule = s.getDailySchedule(day);
 
+            // Storing the minutes scheduled to work per day in a variable
             int dailyMinutes = (int) schedule.getShiftduration() - (int) schedule.getLunchduration();
+            
+            // Adding the daily minutes to be worked in the scheduledMinutesToWork variable
             scheduledMinutesToWork += dailyMinutes;
             
         }
 
+    // Calculating the absenteeism percentage
     double resultPercentage = 100.0 * (scheduledMinutesToWork - totalMinutesWorked) / scheduledMinutesToWork;
 
-    
+    // Converting the double to BigDecimal
     return BigDecimal.valueOf(resultPercentage);
 }
 
-/*
-    Author: Cole Stephens
-    Accepts a list of (already adjusted) Punch objects for an entire pay period, and a Shift object as arguments.
-    This method should iterate through this list, copy the data for each punch into a nested data structure, encode 
-    this structure as a JSON string, and return this string to the caller. 
- */
+    /**
+     * Accepts a list of (already adjusted) Punch objects for an entire pay period, and a Shift object as arguments.
+     *T his method should iterate through this list, copy the data for each punch into a nested data structure, encode 
+     * this structure as a JSON string, and return this string to the caller. 
+     * @param punchlist the punch list of a given day
+     * @param s the shift object
+     * @return the punchlist total as json
+     */
 public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
 
         //Gets the punchListAsJSON method

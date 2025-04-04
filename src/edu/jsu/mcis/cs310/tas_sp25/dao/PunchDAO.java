@@ -44,6 +44,8 @@ public class PunchDAO {
     /**
          * Finds a punch event from the event table
          * @param id The id for the event
+         * @author evanranjitkar
+         * @return Punch
     */
     public Punch find (int id){
         
@@ -127,6 +129,8 @@ public class PunchDAO {
     /**
          * Creates a punch event in the event table
          * @param punchObject Punch object for the event instance
+         * @author evanranjitkar
+         * @return int
     */
     public int create(Punch punchObject){
        
@@ -224,6 +228,8 @@ public class PunchDAO {
          * Finds and lists all punch event for a single day
          * @param badge Badge object for the event instance
          * @param date LocalDate for the getting the punches from that day
+         * @author evanranjitkar
+         ** @return ArrayList<Punch>
     */
     public ArrayList<Punch> list(Badge badge, LocalDate date){
         
@@ -364,6 +370,8 @@ public class PunchDAO {
          * @param badge Badge object for the event instance
          * @param begin LocalDate which marks the beginning date
          * @param end LocalDate which marks the ending date
+         * @author evanranjitkar
+         * @return ArrayList<Punch>
     */
     public ArrayList<Punch> list(Badge badge, LocalDate begin, LocalDate end){
     

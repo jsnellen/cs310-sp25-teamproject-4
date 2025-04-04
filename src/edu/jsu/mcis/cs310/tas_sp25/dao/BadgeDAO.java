@@ -23,6 +23,7 @@ public class BadgeDAO {
     /**
          * Finds a badge from the database 
          * @param id The id for the badge
+         * @return Badge
     */
     public Badge find(String id) {
 
@@ -84,6 +85,12 @@ public class BadgeDAO {
 
     }
 
+    /**
+         * Creates a new badge in the database 
+         * @param badge The badge object to insert into the database
+         * @author Evan Ranjitkar
+         * @return boolean
+    */
     public boolean create(Badge badge){
        
         PreparedStatement ps = null;
@@ -103,9 +110,9 @@ public class BadgeDAO {
                  ps.setString(1, badge.getId());
                  rs = ps.executeQuery();
                  
-                 if (rs.next()) {
+                if (rs.next()) {
                      return false;
-                 }
+                }
 
                 //Creating the query as a PreparedStatement
                 ps = conn.prepareStatement(QUERY_CREATE);
@@ -151,6 +158,12 @@ public class BadgeDAO {
         return false;
     }
     
+    /**
+         * Updates a badge in the database 
+         * @param badge The badge object to update in the database
+         * @author Cole Stephens
+         * @return boolean
+    */
     public boolean update(Badge badge){
         
         PreparedStatement ps = null;
@@ -209,6 +222,12 @@ public class BadgeDAO {
         
     }
     
+     /**
+         * Deletes a badge from the database 
+         * @param id The id for the badge
+         * @author Evan Ranjitkar
+         * @return boolean
+    */
      public boolean delete(String id){
         
         PreparedStatement ps = null;

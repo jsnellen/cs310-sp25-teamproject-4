@@ -42,6 +42,8 @@ public class AbsenteeismDAO {
          * Finds an Absenteeism record from the database 
          * @param employee The employee object for the absenteeism instance
          * @param payPeriodStartDate The LocalDate object for the payPeriodStartDate for the absenteeism calculation
+         * @author evanranjitkar
+         * @return Absenteeism
     */
     public Absenteeism find(Employee employee, LocalDate payPeriodStartDate){
         
@@ -98,6 +100,7 @@ public class AbsenteeismDAO {
      /**
          * Creates an Absenteeism record in the database 
          * @param absenteeismObject The Absenteeism object for the absenteeism instance
+         * @author evanranjitkar
     */
     public void create(Absenteeism absenteeismObject){
 
