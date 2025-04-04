@@ -121,6 +121,61 @@ public class Version2_BadgeCreateDeleteTest {
         assertEquals(true, result);
 
     }
+    
+    //~cStephens
+    @Test
+    public void testUpdate1() {
+        
+        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
+        
+        //Creates new object
+        
+        Badge b6 = new Badge("Black, Jack");
+        
+        //Inserts the new badge object
+        
+        badgeDAO.create(b6);
+        
+        //New updated object
+        
+        Badge updatedBadge = new Badge(b6.getId(), "Poppins, Mary");
+        
+        //Updates the existing description with a new description
+        
+        boolean result = badgeDAO.update(updatedBadge);
+        
+        //Compares and checks the results
+        
+        assertEquals("#2A16AC2F (Poppins, Mary)", updatedBadge.toString());
+        assertEquals(true, result);
+    }
+    
+    @Test
+    public void updateTest2() {
+        
+        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
+        
+        Badge b7 = new Badge("Titus, Demetrian");
+        Badge b8 = new Badge("Calgar, Marneus");
+        
+        badgeDAO.delete(b7.getId());
+        badgeDAO.delete(b8.getId());
+        
+        badgeDAO.create(b7);
+        badgeDAO.create(b8);
+        
+        Badge updatedBadge = new Badge(b8.getId(), "Titus, Demetrian");
+        
+        boolean result = badgeDAO.update(updatedBadge);
+        System.out.println(updatedBadge);
+        
+        assertFalse(result);
+        Badge fromDB = badgeDAO.find(b8.getId());
+        System.out.println(fromDB);
+        assertEquals("#4096CA05 (Calgar, Marneus)", fromDB.toString());
+        
+        
+    }
 }
 
 
