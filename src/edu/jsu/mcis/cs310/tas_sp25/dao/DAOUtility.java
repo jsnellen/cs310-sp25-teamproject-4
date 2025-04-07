@@ -8,6 +8,8 @@ import com.github.cliftonlabs.json_simple.*;
 import edu.jsu.mcis.cs310.tas_sp25.Punch;
 import edu.jsu.mcis.cs310.tas_sp25.Shift;
 import edu.jsu.mcis.cs310.tas_sp25.DailySchedule;
+import static edu.jsu.mcis.cs310.tas_sp25.EventType.CLOCK_IN;
+import static edu.jsu.mcis.cs310.tas_sp25.EventType.CLOCK_OUT;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -34,8 +36,9 @@ public final class DAOUtility {
      * @param shift The Shift object containing shift rules (e.g., lunch
      * duration and threshold).
      * @return The total number of minutes accrued by the employee for the day.
-     * @author Denzel Stinson, Tanner Thomas, cStephens
      */
+    //Author: Evan Ranjitkar
+    //Editied Method: Tanner Thomas, cStephens
     public static int calculateTotalMinutes(ArrayList<Punch> dailyPunchList, Shift shift) {
 
         int totalMinutes = 0; //Initialize the total minutes worked
@@ -69,6 +72,7 @@ public final class DAOUtility {
                         if (!isClockedIn) {
                             clockInTime = punch.getAdjustedTimeStamp().toLocalTime();
                             isClockedIn = true;
+                            //System.out.println("Clock In: " + clockInTime);
                         }
                     }
                     case CLOCK_OUT -> {
@@ -76,31 +80,31 @@ public final class DAOUtility {
                             clockOutTime = punch.getAdjustedTimeStamp().toLocalTime();
                             dailyMinutes += ChronoUnit.MINUTES.between(clockInTime, clockOutTime);
                             isClockedIn = false;
+                            //System.out.println("Clock Out: " + clockOutTime);
+                            //System.out.println("Before Lunch: " + dailyMinutes);
                         }
                     }
                 }
             }
 
             //Deduct lunch if applicable ~Tanner Thomas, Edited by: cStephens
-            if (dailyMinutes > lunchThreshold && clockInTime != null && clockOutTime != null) {
-                if (clockInTime.isBefore(lunchStart) && clockOutTime.isAfter(lunchStop)) {
-                    dailyMinutes -= lunchDuration;
-                }
-            }
+//            if (dailyMinutes > lunchThreshold && clockInTime != null && clockOutTime != null) {
+//                if (clockInTime.isBefore(lunchStart) && clockOutTime.isAfter(lunchStop)) {
+//                    dailyMinutes -= lunchDuration;
+//                    //System.out.println("Lunch Duration " + lunchStart);
+//                    //System.out.println("After Lunch:" + dailyMinutes);
+//                }
+//            }
 
             totalMinutes += dailyMinutes;
+            //System.out.println("Total Minutes: " + totalMinutes);
+            //System.out.println("---------------------------------------------------");
         }
 
         return totalMinutes;
     }
 
-    /**
-     * 
-     * @param dailypunchlist The punch list of a day that needs to be converted
-     * @return converted json String
-     * @author Denzel Stinson
-     */
-    
+    //Author: Evan Ranjitkar
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
         // This is needed or the date and time outputs incorrectly
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
@@ -127,53 +131,41 @@ public final class DAOUtility {
 
     }
 
-    /**
-     * Calculate the absenteeism percentage 
-     * @param punchlist the punch list of a given day
-     * @param s the shift object whose absenteeism percentage needs to be calculated
-     * @return the absenteeism percentage in BigDecimal
-     * @author Evan Ranjitkar
-     */
+    //Author:Evan Ranjitkar
     public static BigDecimal calculateAbsenteeism(ArrayList<Punch> punchlist, Shift s) {
 
-        // Using the calculateTotalMinutes method to calculate the total minutes worked
         int totalMinutesWorked = calculateTotalMinutes(punchlist, s);
 
-        // Initializing a variable to store the minutes scheduled to work in a week
         int scheduledMinutesToWork = 0;
 
-        // for loop to loop through the five work days
         for (int i = 1; i <= 5; i++) {
-            
-            // Using DayOfWeek library to get the day
             DayOfWeek day = DayOfWeek.of(i);
-            
-            // Using the getDailySchedule method of the shift object to get the schedule of the current day
             DailySchedule schedule = s.getDailySchedule(day);
 
-            // Storing the minutes scheduled to work per day in a variable
             int dailyMinutes = (int) schedule.getShiftduration() - (int) schedule.getLunchduration();
-            
-            // Adding the daily minutes to be worked in the scheduledMinutesToWork variable
             scheduledMinutesToWork += dailyMinutes;
+//            System.out.println("Daily Minutes: " + dailyMinutes);
+//            System.out.println("Scheduled Minutes To Work: " + scheduledMinutesToWork);
+            //System.out.println("------------------------------------");
             
         }
+    System.out.println("Scheduled Minutes: " + scheduledMinutesToWork);
+    System.out.println("Worked Minutes: " + totalMinutesWorked);
 
-    // Calculating the absenteeism percentage
     double resultPercentage = 100.0 * (scheduledMinutesToWork - totalMinutesWorked) / scheduledMinutesToWork;
 
-    // Converting the double to BigDecimal
+    System.out.println(resultPercentage);
+    //System.out.println("--------------------------");
+    
     return BigDecimal.valueOf(resultPercentage);
 }
 
-    /**
-     * Accepts a list of (already adjusted) Punch objects for an entire pay period, and a Shift object as arguments.
-     *T his method should iterate through this list, copy the data for each punch into a nested data structure, encode 
-     * this structure as a JSON string, and return this string to the caller. 
-     * @param punchlist the punch list of a given day
-     * @param s the shift object
-     * @return the punchlist total as json
-     */
+/*
+    Author: Cole Stephens
+    Accepts a list of (already adjusted) Punch objects for an entire pay period, and a Shift object as arguments.
+    This method should iterate through this list, copy the data for each punch into a nested data structure, encode 
+    this structure as a JSON string, and return this string to the caller. 
+ */
 public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
 
         //Gets the punchListAsJSON method
