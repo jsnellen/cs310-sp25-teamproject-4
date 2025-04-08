@@ -25,6 +25,7 @@ public class EmployeeDAO {
     /**
          * Finds an Employee from the database with the id
          * @param id The id for the employee
+         * @return Employee
     */
     
     public Employee find(int id){
@@ -105,6 +106,7 @@ public class EmployeeDAO {
     /**
          * Finds an Employee from the database with the badge
          * @param badge The badge object for the employee instance
+         * @return Employee
     */
     public Employee find(Badge badge){
         

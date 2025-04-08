@@ -6,8 +6,10 @@ import java.sql.*;
 public class BadgeDAO {
 
     private static final String QUERY_FIND = "SELECT * FROM badge WHERE id = ?";
+    private static final String QUERY_FIND_ID = "SELECT id FROM badge WHERE id = ?"; //~cStephens
     private static final String QUERY_CREATE = "INSERT INTO badge (id, description) VALUES (?, ?) ";
-    private static final String QUERY_UPDATE = " ";
+    private static final String QUERY_UPDATE = "UPDATE badge SET description = ? WHERE id = ?"; //~cStephens
+    private static final String QUERY_NOT_EQUAL = "SELECT id FROM badge WHERE description = ? AND id <> ?";
     private static final String QUERY_DELETE = "DELETE FROM badge WHERE id = ?";
 
     private final DAOFactory daoFactory;
@@ -21,6 +23,7 @@ public class BadgeDAO {
     /**
          * Finds a badge from the database 
          * @param id The id for the badge
+         * @return Badge
     */
     public Badge find(String id) {
 
@@ -82,6 +85,12 @@ public class BadgeDAO {
 
     }
 
+    /**
+         * Creates a new badge in the database 
+         * @param badge The badge object to insert into the database
+         * @author Evan Ranjitkar
+         * @return boolean
+    */
     public boolean create(Badge badge){
        
         PreparedStatement ps = null;
@@ -94,7 +103,16 @@ public class BadgeDAO {
         try {
             Connection conn = daoFactory.getConnection();
             
+            //Checks for duplicate badges ~cStephens
              if (conn.isValid(0)) {
+                 
+                 ps = conn.prepareStatement(QUERY_FIND_ID);
+                 ps.setString(1, badge.getId());
+                 rs = ps.executeQuery();
+                 
+                if (rs.next()) {
+                     return false;
+                }
 
                 //Creating the query as a PreparedStatement
                 ps = conn.prepareStatement(QUERY_CREATE);
@@ -140,6 +158,12 @@ public class BadgeDAO {
         return false;
     }
     
+    /**
+         * Updates a badge in the database 
+         * @param badge The badge object to update in the database
+         * @author Cole Stephens
+         * @return boolean
+    */
     public boolean update(Badge badge){
         
         PreparedStatement ps = null;
@@ -149,8 +173,20 @@ public class BadgeDAO {
             Connection conn = daoFactory.getConnection();
             
              if (conn.isValid(0)) {
+                 
+                 ps = conn.prepareStatement(QUERY_NOT_EQUAL);
+                 ps.setString(1, badge.getDescription());
+                 ps.setString(2, badge.getId());
+                 rs = ps.executeQuery();
+                 
+                 if (rs.next()) {
+                     return false;
+                 }
+                 ps.close();
 
                 ps = conn.prepareStatement(QUERY_UPDATE);
+                ps.setString(1, badge.getDescription());
+                ps.setString(2, badge.getId());
                 
                 int rowsAffected = ps.executeUpdate();
                 
@@ -186,6 +222,12 @@ public class BadgeDAO {
         
     }
     
+     /**
+         * Deletes a badge from the database 
+         * @param id The id for the badge
+         * @author Evan Ranjitkar
+         * @return boolean
+    */
      public boolean delete(String id){
         
         PreparedStatement ps = null;
