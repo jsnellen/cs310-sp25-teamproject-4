@@ -40,6 +40,7 @@ public class Version2_BadgeSummaryTest {
         
         /* Compare to Expected Values */
         
+        
         assertNotNull(jsonExpected);
         assertNotNull(jsonActual);
         assertEquals(jsonExpected, jsonActual);
