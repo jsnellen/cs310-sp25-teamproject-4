@@ -8,8 +8,6 @@ import com.github.cliftonlabs.json_simple.*;
 import edu.jsu.mcis.cs310.tas_sp25.Punch;
 import edu.jsu.mcis.cs310.tas_sp25.Shift;
 import edu.jsu.mcis.cs310.tas_sp25.DailySchedule;
-import static edu.jsu.mcis.cs310.tas_sp25.EventType.CLOCK_IN;
-import static edu.jsu.mcis.cs310.tas_sp25.EventType.CLOCK_OUT;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -57,6 +55,10 @@ public final class DAOUtility {
             LocalTime clockInTime = null; //Store the time of the most recent clock in punch
             LocalTime clockOutTime = null; // Store the time of the most recent clock out punch
 
+            // Tracking variables for lunch deduction
+            LocalTime earliestIn = null;
+            LocalTime latestOut = null;
+
             DayOfWeek day = date.getDayOfWeek();
             DailySchedule schedule = shift.getDailySchedule(day);
 
@@ -72,7 +74,11 @@ public final class DAOUtility {
                         if (!isClockedIn) {
                             clockInTime = punch.getAdjustedTimeStamp().toLocalTime();
                             isClockedIn = true;
-                            //System.out.println("Clock In: " + clockInTime);
+
+                            // Track earliest clock in
+                            if (earliestIn == null || clockInTime.isBefore(earliestIn)) {
+                                earliestIn = clockInTime;
+                            }
                         }
                     }
                     case CLOCK_OUT -> {
@@ -80,31 +86,28 @@ public final class DAOUtility {
                             clockOutTime = punch.getAdjustedTimeStamp().toLocalTime();
                             dailyMinutes += ChronoUnit.MINUTES.between(clockInTime, clockOutTime);
                             isClockedIn = false;
-                            //System.out.println("Clock Out: " + clockOutTime);
-                            //System.out.println("Before Lunch: " + dailyMinutes);
+
+                            // Track latest clock out
+                            if (latestOut == null || clockOutTime.isAfter(latestOut)) {
+                                latestOut = clockOutTime;
+                            }
                         }
                     }
                 }
             }
+                //Deduct lunch if applicable ~Tanner Thomas, Edited by: cStephens
+                if (dailyMinutes > lunchThreshold && earliestIn != null && latestOut != null) {
+                    if (!earliestIn.isAfter(lunchStart) && latestOut.isAfter(lunchStop)) {
+                        dailyMinutes -= lunchDuration;
+                    }
+                }
 
-            //Deduct lunch if applicable ~Tanner Thomas, Edited by: cStephens
-//            if (dailyMinutes > lunchThreshold && clockInTime != null && clockOutTime != null) {
-//                if (clockInTime.isBefore(lunchStart) && clockOutTime.isAfter(lunchStop)) {
-//                    dailyMinutes -= lunchDuration;
-//                    //System.out.println("Lunch Duration " + lunchStart);
-//                    //System.out.println("After Lunch:" + dailyMinutes);
-//                }
-//            }
+                totalMinutes += dailyMinutes;
+            }
 
-            totalMinutes += dailyMinutes;
-            //System.out.println("Total Minutes: " + totalMinutes);
-            //System.out.println("---------------------------------------------------");
+            return totalMinutes;
         }
-
-        return totalMinutes;
-    }
-
-    //Author: Evan Ranjitkar
+        //Author: Evan Ranjitkar
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
         // This is needed or the date and time outputs incorrectly
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
@@ -144,29 +147,21 @@ public final class DAOUtility {
 
             int dailyMinutes = (int) schedule.getShiftduration() - (int) schedule.getLunchduration();
             scheduledMinutesToWork += dailyMinutes;
-//            System.out.println("Daily Minutes: " + dailyMinutes);
-//            System.out.println("Scheduled Minutes To Work: " + scheduledMinutesToWork);
-            //System.out.println("------------------------------------");
-            
+
         }
-    System.out.println("Scheduled Minutes: " + scheduledMinutesToWork);
-    System.out.println("Worked Minutes: " + totalMinutesWorked);
 
-    double resultPercentage = 100.0 * (scheduledMinutesToWork - totalMinutesWorked) / scheduledMinutesToWork;
+        double resultPercentage = 100.0 * (scheduledMinutesToWork - totalMinutesWorked) / scheduledMinutesToWork;
 
-    System.out.println(resultPercentage);
-    //System.out.println("--------------------------");
-    
-    return BigDecimal.valueOf(resultPercentage);
-}
+        return BigDecimal.valueOf(resultPercentage);
+    }
 
-/*
+    /*
     Author: Cole Stephens
     Accepts a list of (already adjusted) Punch objects for an entire pay period, and a Shift object as arguments.
     This method should iterate through this list, copy the data for each punch into a nested data structure, encode 
     this structure as a JSON string, and return this string to the caller. 
- */
-public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
+     */
+    public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
 
         //Gets the punchListAsJSON method
         String punchListJSON = getPunchListAsJSON(punchlist);
