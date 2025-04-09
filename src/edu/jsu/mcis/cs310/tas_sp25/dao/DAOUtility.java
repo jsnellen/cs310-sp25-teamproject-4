@@ -8,6 +8,7 @@ import com.github.cliftonlabs.json_simple.*;
 import edu.jsu.mcis.cs310.tas_sp25.Punch;
 import edu.jsu.mcis.cs310.tas_sp25.Shift;
 import edu.jsu.mcis.cs310.tas_sp25.DailySchedule;
+import edu.jsu.mcis.cs310.tas_sp25.EventType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ public final class DAOUtility {
             // Tracking variables for lunch deduction
             LocalTime earliestIn = null;
             LocalTime latestOut = null;
+            boolean lunchClockedOut = false;
 
             DayOfWeek day = date.getDayOfWeek();
             DailySchedule schedule = shift.getDailySchedule(day);
@@ -68,7 +70,9 @@ public final class DAOUtility {
             LocalTime lunchStop = schedule.getLunchstop(); // Lunch ends
 
             //Iterate through the list of punches
-            for (Punch punch : dailyPunches) {
+            // Gets a punch and the punch after it 
+            for (int i = 0; i < dailyPunches.size(); i++) {
+                Punch punch = dailyPunches.get(i);
                 switch (punch.getEventType()) {
                     case CLOCK_IN -> {
                         if (!isClockedIn) {
@@ -91,12 +95,26 @@ public final class DAOUtility {
                             if (latestOut == null || clockOutTime.isAfter(latestOut)) {
                                 latestOut = clockOutTime;
                             }
+                            // Checks if the employee clocked out at lunch and clocked back in at 12:30
+                            if ((i + 1) < dailyPunches.size()){
+                                Punch nextPunch = dailyPunches.get(i + 1);
+                                if (nextPunch.getEventType()== EventType.CLOCK_IN){
+                                    LocalTime outTime = clockOutTime;
+                                    LocalTime inTime = nextPunch.getAdjustedTimeStamp().toLocalTime();
+                                    // If employee clocked out after lunch started and clcoks back in at 12:30  
+                                    if (!outTime.isAfter(lunchStart) && !inTime.isBefore(lunchStop)){
+                                        lunchClockedOut = true; // Employee manually clocked out
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
                 //Deduct lunch if applicable ~Tanner Thomas, Edited by: cStephens
-                if (dailyMinutes > lunchThreshold && earliestIn != null && latestOut != null) {
+                // The conditions are: The employee worked over the threshold, did not manually clock out for lunch
+                // and they need to have clocked in and out for that day (they had to work that day)
+                if (dailyMinutes > lunchThreshold && !lunchClockedOut && earliestIn != null && latestOut != null) {
                     if (!earliestIn.isAfter(lunchStart) && latestOut.isAfter(lunchStop)) {
                         dailyMinutes -= lunchDuration;
                     }
