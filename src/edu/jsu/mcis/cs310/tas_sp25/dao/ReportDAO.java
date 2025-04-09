@@ -37,6 +37,7 @@ public class ReportDAO{
     
     public String getBadgeSummary(Integer departmentId){
         
+        
         JsonArray resultArray = new JsonArray();
         
         PreparedStatement ps = null;
