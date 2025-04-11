@@ -22,9 +22,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+
 /**
- *
- * @author evanranjitkar
+ * Data Access Object (DAO) for managing absenteeism records in the database.
+ * 
+ * <p>Provides methods to find and create absenteeism entries on an employee's ID and pay period.</p>
+ * 
+ * @author Evan Ranjitkar
  */
 public class AbsenteeismDAO {
     
@@ -39,11 +43,13 @@ public class AbsenteeismDAO {
                                                 + "ON DUPLICATE KEY UPDATE percentage = ?";
     
     /**
-         * Finds an Absenteeism record from the database 
-         * @param employee The employee object for the absenteeism instance
-         * @param payPeriodStartDate The LocalDate object for the payPeriodStartDate for the absenteeism calculation
-         * @author evanranjitkar
-         * @return Absenteeism
+         * Retrieves the absenteeism record for a given employee and pay period start date. 
+         * 
+         * @param employee The employee whose absenteeism record is being retrieved. 
+         * @param payPeriodStartDate The starting date of the pay period (will be adjusted to the previous or same Sunday.)
+         * @return the Absenteeism record, or null if none is found
+         * 
+         * @author Evan Ranjitkar
     */
     public Absenteeism find(Employee employee, LocalDate payPeriodStartDate){
         
@@ -98,8 +104,9 @@ public class AbsenteeismDAO {
     }
     
      /**
-         * Creates an Absenteeism record in the database 
-         * @param absenteeismObject The Absenteeism object for the absenteeism instance
+         * Inserts a new absenteeism record into the database, or updates the existing record if one already exists.
+         * 
+         * @param absenteeismObject The Absenteeism object to be inserted or updated in the database.
          * @author evanranjitkar
     */
     public void create(Absenteeism absenteeismObject){

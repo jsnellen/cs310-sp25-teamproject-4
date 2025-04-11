@@ -9,13 +9,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 /**
- *The `DailySchedule` class represents a daily work schedule with its associated properties such as shift start/stop times,
- * lunch start/stop times, rounding interval, grace period, dock penalty, lunch threshold, and calculated durations for
- * the shift and lunch break.
+ * Represents a daily work schedule including shift times, lunch breaks, rounding rules, grace periods,
+ * and penalties. It also calculates the total shift and lunch durations.
  *
- * This class is designed to store and provide access to daily schedule details for use in a time and attendance system.
+ * <p>This class is part of the time and attendance system.</p>
  * 
- * @author denzel
+ * @author Denzel Stinson
  */
 public class DailySchedule {
     
@@ -32,10 +31,9 @@ public class DailySchedule {
     private final long shiftduration; //Duration of the shift in minutes
     
     /**
-     * Constructor for the `DailySchedule` class.
-     * Initializes the schedule properties using a Map containing the schedule details.
+     * Constructs a new DailySchedule using key-value pairs provided in a map.
      *
-     * @param scheduleInfo A Map containing key-value pairs for schedule properties.
+     * @param scheduleInfo A map containing schedule information such as shift/lunch times and policies.
      */
     public DailySchedule(Map<String, String> scheduleInfo) {
     
@@ -57,7 +55,7 @@ public class DailySchedule {
     //Getters methods for accessing shift properties
     
     /**
-     * Returns the shift start time.
+     * Gets the shift start time.
      *
      * @return The shift start time.
      */
@@ -66,7 +64,7 @@ public class DailySchedule {
     }
 
     /**
-     * Returns the shift stop time.
+     * Gets the shift end time.
      * 
      * @return The shift stop time.
      */
@@ -75,16 +73,16 @@ public class DailySchedule {
     }
 
     /**
-     * Returns the lunch start break time.
+     * Gets the lunch break start time.
      * 
-     * @return The lunch start break time.
+     * @return The lunch break start time.
      */
     public LocalTime getLunchstart() {
         return lunchstart;
     }
 
     /**
-     * Returns the lunch break stop time.
+     * Gets the lunch break stop time.
      * 
      * @return The lunch break stop time.
      */
@@ -93,16 +91,16 @@ public class DailySchedule {
     }
 
    /**
-    * Returns the dock penalty for clocking in/out late.
+    * Gets the dock penalty applied for late punches.
     * 
-    * @return the dock penalty in minutes.
+    * @return The dock penalty in minutes.
     */
     public int getDockpenalty() {
         return dockpenalty;
     }
 
     /**
-     * Returns the lunch threshold.
+     * Gets the lunch threshold time.
      * 
      * @returns The lunch threshold in minutes.
      */
@@ -111,34 +109,34 @@ public class DailySchedule {
     }
 
     /**
-     * Returns the round interval 
+     * Gets the rounding interval in minutes. 
      * 
-     * @return The rounding interval in minutes.
+     * @return The rounding interval.
      */
     public int getRoundInterval() {
         return roundinterval;
     }
 
     /**
-     * Returns the grace period for clocking in/out.
+     * Gets the grace period in minutes..
      *
-     * @return The grace period in minutes.
+     * @return The grace period.
      */
     public int getGracePeriod() {
         return graceperiod;
     }
     
     /**
-     * Returns the duration of the lunch break.
+     * Gets the duration of the lunch break.
      *
-     * @return The lunch break duration in minutes.
+     * @return The lunch duration in minutes.
      */
     public long getLunchduration() {
         return lunchduration;
     }
     
     /**
-     * Returns the duration of the shift.
+     * Gets the total duration of the shift.
      *
      * @return The shift duration in minutes.
      */

@@ -3,12 +3,20 @@ package edu.jsu.mcis.cs310.tas_sp25.dao;
 import edu.jsu.mcis.cs310.tas_sp25.*;
 import java.sql.*;
 
+/**
+ * Data Access Object (DAO) for managing badge records in the database.
+ * 
+ * <p>Provides methods to find, create, update, and delete badge entries based on
+ * an employee's badge ID and description.</p>
+ * 
+ * @author Evan Ranjitkar, Cole Stephens
+ */
 public class BadgeDAO {
 
     private static final String QUERY_FIND = "SELECT * FROM badge WHERE id = ?";
-    private static final String QUERY_FIND_ID = "SELECT id FROM badge WHERE id = ?"; //~cStephens
+    private static final String QUERY_FIND_ID = "SELECT id FROM badge WHERE id = ?";
     private static final String QUERY_CREATE = "INSERT INTO badge (id, description) VALUES (?, ?) ";
-    private static final String QUERY_UPDATE = "UPDATE badge SET description = ? WHERE id = ?"; //~cStephens
+    private static final String QUERY_UPDATE = "UPDATE badge SET description = ? WHERE id = ?";
     private static final String QUERY_NOT_EQUAL = "SELECT id FROM badge WHERE description = ? AND id <> ?";
     private static final String QUERY_DELETE = "DELETE FROM badge WHERE id = ?";
 
@@ -21,9 +29,10 @@ public class BadgeDAO {
     }
 
     /**
-         * Finds a badge from the database 
-         * @param id The id for the badge
-         * @return Badge
+         * Retrieves a badge record from the database based on the provided badge ID.
+         * 
+         * @param id The badge ID to search for.
+         * @return a badge object if found, otherwise null. 
     */
     public Badge find(String id) {
 
@@ -86,10 +95,13 @@ public class BadgeDAO {
     }
 
     /**
-         * Creates a new badge in the database 
-         * @param badge The badge object to insert into the database
+         * Inserts a new badge record into the database. A new badge ID is generated based on the description.
+         * Duplicate badge entries are not allowed.
+         * 
+         * @param badge a badge containing the employee's description.
+         * @return true if the badge was successfully created; false if a duplicate exists.
+         * 
          * @author Evan Ranjitkar
-         * @return boolean
     */
     public boolean create(Badge badge){
        
@@ -159,10 +171,13 @@ public class BadgeDAO {
     }
     
     /**
-         * Updates a badge in the database 
-         * @param badge The badge object to update in the database
+         * Updates the description of an existing badge record in the database.
+         * If another badge already has the same description, the update is not performed.
+         * 
+         * @param badge The badge object containing updated information.
+         * @return true if the update was successful; false if a conflict exists.
+         * 
          * @author Cole Stephens
-         * @return boolean
     */
     public boolean update(Badge badge){
         
@@ -223,11 +238,13 @@ public class BadgeDAO {
     }
     
      /**
-         * Deletes a badge from the database 
-         * @param id The id for the badge
-         * @author Evan Ranjitkar
-         * @return boolean
-    */
+      * Deletes a badge record from the database based on the provided badge ID.
+      * 
+      * @param id The badge ID of the record to delete.
+      * @return true if the record was successfully deleted; false otherwise. 
+      * 
+      * @author Evan Ranjitkar
+      */
      public boolean delete(String id){
         
         PreparedStatement ps = null;
