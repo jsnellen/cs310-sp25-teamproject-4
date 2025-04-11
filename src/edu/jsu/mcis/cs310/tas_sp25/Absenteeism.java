@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
  * and the absenteeism percentage for that period. It is used to track employee 
  * absenteeism data and provides a formatted string representation for reporting.
  * 
- * @author Denzel
+ * @author Denzel Stinson
  */
 public class Absenteeism {
     

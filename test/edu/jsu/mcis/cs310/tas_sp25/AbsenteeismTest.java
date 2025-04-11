@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
  * period scenarios (weekdays, weekends, etc.).</p>
  * 
  * Uses JUnit 4 framework.
- * @author coles
+ * @author Cole Stephens
  */
 public class AbsenteeismTest {
     
