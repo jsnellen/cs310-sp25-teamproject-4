@@ -4,8 +4,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- *
- * @author denzel
+ * Represents an absenteeism record for an employee within a specific pay period.
+ * This class holds the employee information, the start date of the pay period,
+ * and the absenteeism percentage for that period. It is used to track employee 
+ * absenteeism data and provides a formatted string representation for reporting.
+ * 
+ * @author Denzel Stinson
  */
 public class Absenteeism {
     
@@ -13,45 +17,61 @@ public class Absenteeism {
     private LocalDate payPeriodStartDate;
     private BigDecimal absenteeismPercentage;
     
+    /**
+         * Constructs an Absenteeism object with given employee, pay period start date,
+         * and absenteeism percentage.
+         * 
+         * @param employee The employee for whom absenteeism is being recorded.
+         * @param payPeriodStartDate The start date of the pay period.
+         * @param absenteeismPercentage The absenteeism percentage for the employee during this pay period.
+         * 
+         */
     public Absenteeism(Employee employee, LocalDate payPeriodStartDate, BigDecimal absenteeismPercentage) {
     
-        /**
-         * @param employee The employee object for the absenteeism instance
-         * @param payPeriodStartDate The LocalDate object for the payPeriodStartDate for the absenteeism calculation
-         * @param absenteeismPercentage The calculated absenteeism percentage for the employee
-         */
         this.employee = employee;
         this.payPeriodStartDate = payPeriodStartDate;
         this.absenteeismPercentage = absenteeismPercentage;
     }
     
     /**
-     * Getter for the employee class variable
-     * @return employee
+     * Returns the employee associated with this absenteeism record.
+     * 
+     * @return The employee object associated with this absenteeism record.
      */
     public Employee getEmployee() {
         return employee;
     }
     
     /**
-     * Getter for the payPeriodStartDate class variable
-     * @return payPeriodStartDate
+     * Returns the start date of the pay period for this absenteeism record.
+     * 
+     * @return The pay period start date as a LocalDate object.
      */
     public LocalDate getPayPeriodStartDate() {
         return payPeriodStartDate;
     }
     
     /**
-     * Getter for the absenteeismPercentage class variable
-     * @return absenteeismPercentage
+     * Returns the absenteeism percentage for the employee during the specified pay period.
+     * 
+     * @return The absenteeism percentage as a BigDecimal.
      */
     public BigDecimal getAbsenteeismPercentage() {
         return absenteeismPercentage;
     }
     
     /**
-     * toString override for the class
-     * @return
+     * Returns a string representation of this absenteeism record in the format:
+     * <br>#EmployeeID (Pay Period Starting MM-dd-yyyy): X.XX%
+     * 
+     * <p>The format is as follows:</p>
+     * <ul>
+     *      <li><b>EmployeeID</b> is the ID of the employee.</li>
+     *      <li><b>Pay Period Starting</b> is the formatted start date of the pay period.</li>
+     *      <li><b>X.XX%</b> is the absenteeism percentage, rounded to two decimal places.</li>
+     * </ul>
+     * 
+     * @return A formatted string representing the absenteeism record.
      */
     @Override
     public String toString() {

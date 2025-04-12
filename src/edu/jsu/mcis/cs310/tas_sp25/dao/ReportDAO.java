@@ -3,9 +3,11 @@ package edu.jsu.mcis.cs310.tas_sp25.dao;
 import com.github.cliftonlabs.json_simple.JsonArray;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsoner;
+import edu.jsu.mcis.cs310.tas_sp25.EmployeeType;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 /**
@@ -35,7 +37,12 @@ public class ReportDAO{
             + "JOIN employeetype ON employee.employeetypeid = employeetype.id "
             + "ORDER BY badge.description";
     
+    private static final String Query_GET_HOURS = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
+            + ", employee.lastname AS lastName, department.description AS departmentName,"
+            + " employeetype.description AS employeeType, shift.description AS assignedShift";
+    
     public String getBadgeSummary(Integer departmentId){
+        
         
         JsonArray resultArray = new JsonArray();
         
@@ -48,6 +55,73 @@ public class ReportDAO{
             
              if (conn.isValid(0)) {
 
+                if(departmentId != null){
+                    
+                     ps = conn.prepareStatement(Query_GETID);
+                     ps.setInt(1, departmentId);
+                     
+                } else {
+                    ps = conn.prepareStatement(Query_GETNULL);
+                }
+                
+                // Executing the PreparedStatement
+                boolean hasResults = ps.execute();
+
+                // If query has results, then retrieving the data
+                if (hasResults){
+                    
+                // Getting result set and storing it in the ResultSet variable
+                rs = ps.getResultSet();
+                    
+                while(rs.next()){
+                    
+                    JsonObject result = new JsonObject();
+                    
+                    result.put("badgeid",rs.getString("badgeId"));
+                    result.put("name",rs.getString("employeeName"));
+                    result.put("department",rs.getString("departmentName"));
+                    result.put("type",rs.getString("employeeType"));
+                    
+                    resultArray.add(result);
+                }
+                
+              }
+           }
+        }
+        catch (Exception e) { e.printStackTrace(); }
+        
+        finally {
+            
+            if (rs != null) { try { rs.close(); } catch (Exception e) { e.printStackTrace(); } }
+            if (ps != null) { try { ps.close(); } catch (Exception e) { e.printStackTrace(); } }
+            
+        }
+        
+        return Jsoner.serialize(resultArray);
+    }
+    
+    public String getHoursSummary(LocalDate date, Integer departmentId, EmployeeType employeeType){
+        
+        JsonArray resultArray = new JsonArray();
+        
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            Connection conn = daoFactory.getConnection();
+            
+             if (conn.isValid(0)) {
+
+                if(departmentId != null){
+                    
+                     ps = conn.prepareStatement(Query_GETID);
+                     ps.setInt(1, departmentId);
+                     
+                } else {
+                    ps = conn.prepareStatement(Query_GETNULL);
+                }
+                
                 if(departmentId != null){
                     
                      ps = conn.prepareStatement(Query_GETID);

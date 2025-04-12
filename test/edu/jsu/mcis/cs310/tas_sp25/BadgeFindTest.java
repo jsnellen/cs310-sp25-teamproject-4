@@ -4,10 +4,18 @@ import edu.jsu.mcis.cs310.tas_sp25.dao.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 
+/**
+ * Unit test class for verifying the functionality of the BadgeDAO#find(String) method.
+ * 
+ * <p>Ensures correct retrieval of badge information based on badge ID.</p>
+ */
 public class BadgeFindTest {
 
     private DAOFactory daoFactory;
 
+    /**
+     * Sets up the DAO factory before each unit test to prepare DAO access. 
+     */
     @Before
     public void setup() {
 
@@ -15,6 +23,11 @@ public class BadgeFindTest {
 
     }
 
+    /**
+     * Tests BageDAO#find(String) for badge ID "12565C60".
+     * 
+     * Expected result: #12565C60 (Chapman, Joshua E)
+     */
     @Test
     public void testFindBadge1() {
         
@@ -30,6 +43,11 @@ public class BadgeFindTest {
 
     }
 
+    /**
+     * Tests BadgeDAO#find(String) for badge ID "08D01475".
+     * 
+     * Expected result: #08D01475 (Littell, Amie D)
+     */
     @Test
     public void testFindBadge2() {
         
@@ -45,6 +63,11 @@ public class BadgeFindTest {
 
     }
     
+    /**
+     * Tests BadgeDAO#find(String) for badge ID "D2CC71D4".
+     * 
+     * Expected result: #D2CC71D4 (Lawson, Matthew J)
+     */
     @Test
     public void testFindBadge3() {
         

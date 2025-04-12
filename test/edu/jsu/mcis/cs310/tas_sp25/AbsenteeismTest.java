@@ -13,10 +13,26 @@ import java.util.ArrayList;
 import org.junit.*;
 import static org.junit.Assert.*;
 
+/**
+ * Unit test class for verifying absenteeism calculations in the TAS system.
+ * 
+ * <p>This class uses data access objects (DAOs) to retrieve punch, employee,
+ * and absenteeism data, and calculates absenteeism percentages over a given 
+ * pay period. It validates the results against expected string outputs.</p>
+ * 
+ * <p>The class includes tests for employees with various shift types and pay 
+ * period scenarios (weekdays, weekends, etc.).</p>
+ * 
+ * Uses JUnit 4 framework.
+ * @author Cole Stephens
+ */
 public class AbsenteeismTest {
     
     private DAOFactory daoFactory;
 
+    /**
+     * Sets up the DAOFactory before each test to prepare DAO access.
+     */
     @Before
     public void setup() {
 
@@ -24,6 +40,14 @@ public class AbsenteeismTest {
 
     }
     
+    /**
+     * Tests absenteeism calculation for an employee on Shift 1 during a weekday pay period.
+     * 
+     * <p>Checks the absenteeism percentage and verifies the correct value is inserted
+     * and retrieved from the database.</p>
+     * 
+     * Expected absenteeism value: 2.50%
+     */
     @Test
     public void testAbsenteeismShift1Weekday() {
         
@@ -70,7 +94,14 @@ public class AbsenteeismTest {
         assertEquals("#28DC3FB8 (Pay Period Starting 09-02-2018): 2.50%", a2.toString());
         
     }
-    
+    /**
+     * Test absenteeism calculation for an employee on Shift 1 during a weekend pay period.
+     * 
+     * <p>Checks if the absenteeism value is correctly computed for an unusual schedule.
+     * This may test cases where extra hours are worked (negative absenteeism).</p>
+     * 
+     * Expected absenteeism value: -20.00%
+     */
     @Test
     public void testAbsenteeismShift1Weekend() {
         
@@ -118,6 +149,13 @@ public class AbsenteeismTest {
         
     }
     
+    /**
+     * Tests absenteeism calculation for an employee on Shift 2 during a weekend pay period.
+     * 
+     * <p>Validates absenteeism tracking for non-standard shift hours on weekends.</p>
+     * 
+     * Expected absenteeism value: -28.75%
+     */
     @Test
     public void testAbsenteeismShift2Weekend() {
         
