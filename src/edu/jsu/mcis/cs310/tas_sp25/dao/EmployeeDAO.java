@@ -9,7 +9,12 @@ import edu.jsu.mcis.cs310.tas_sp25.EmployeeType;
 import edu.jsu.mcis.cs310.tas_sp25.Employee;
 
 /**
- *
+ * Data Access Object (DAO) class for accessing and retrieving Employee records from the database.
+ * 
+ * <p>Provides methods to find an employee by ID or {@code Badge}, and maps the result
+ * to an {@code Employee} model object. Includes relationships to associated data like
+ * department, shift, and employee type.</p>
+ * 
  * @author Tanner Thomas
  */
 public class EmployeeDAO {
@@ -105,6 +110,7 @@ public class EmployeeDAO {
     
     /**
          * Finds an Employee from the database with the badge
+         * First performs a lookup to retrieve the employee's ID, and then uses the ID-based `find()` method.
          * @param badge The badge object for the employee instance
          * @return Employee
     */

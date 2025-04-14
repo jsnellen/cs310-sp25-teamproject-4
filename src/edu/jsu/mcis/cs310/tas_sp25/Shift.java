@@ -7,6 +7,12 @@ import java.time.DayOfWeek;
 
 /**
  *
+ * Represents a work shift, including start/stop times, lunch breaks,
+ * rounding rules, and daily schedule overrides.
+ *
+ * <p>Each {@code Shift} contains a default schedule and optional daily overrides for 
+ * each weekday. It supports cloning and comparison based on shift ID.</p>
+ * 
  * @author denzel
  * @author mahin
  * @author Tanner Thomas

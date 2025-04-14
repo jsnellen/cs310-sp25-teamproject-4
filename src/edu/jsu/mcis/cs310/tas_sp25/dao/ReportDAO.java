@@ -17,7 +17,11 @@ import java.util.HashMap;
 import java.util.Locale;
 
 /**
- *
+ * DAO for generating various JSON-based employee reports, including badge summaries, hours summaries, and real-time attendance status.
+ * 
+ *<p>Provides methods to retrieve data such as badge summaries, hours worked, and 
+ * real-time attendance status ("Who's In/Out"). Results are returned as JSON strings</p>
+ * 
  * @author evanranjitkar
  */
 public class ReportDAO{

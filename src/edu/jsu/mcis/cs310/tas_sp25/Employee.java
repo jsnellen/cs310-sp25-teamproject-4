@@ -6,6 +6,9 @@ import java.time.format.DateTimeFormatter;
  * 
  * The `Employee` class represents an employee with its associated properties such as id, name,
  * badge, department, shift, etc
+ * 
+ * <p>This class serves as a model for storing employee-related data retrieved from 
+ * the database. It supports string representation and access to all key attributes.</p>
  *
  * @author Tanner Thomas
  */

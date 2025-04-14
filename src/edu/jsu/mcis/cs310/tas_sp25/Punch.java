@@ -1,5 +1,13 @@
 /**
  *
+ *A punch records when an employee clocks in, clocks out, or times out at a terminal using their badge. 
+ * 
+ * <p>Each punch includes metadata such as the original and adjusted timestamp, 
+ * event type (e.g., CLOCK_IN, CLOCK_OUT), terminal ID, and the type of time adjustment (e.g., rounded, grace period, docked).</p>
+ * 
+ * <p>Adjustment logic is applied based on the employee's shift and includes rules for rounding, grace period, 
+ * dock penalties, and lunch time adjustments. It supports weekend rules and preserves both original and adjusted timestamps.</p>
+ * 
  * @author evanranjitkar
  * @author Tanner Thomas
  * @author mahin patel

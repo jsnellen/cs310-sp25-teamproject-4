@@ -11,8 +11,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 /**
  * DAO for retrieving department records from the database.
- * This class follows the DAO pattern to interact with the "department" table.
- * It retrieves department data and maps it to a Department model object.
+ * <p>This class provides a method to retrieve a {@code Department} from the database
+ * using its unique ID. It maps data from the {@code department} table to the 
+ * {@code Department} model object.</p>
+ * 
  * @author mahinpatel
  */
 public class DepartmentDAO {

@@ -6,6 +6,9 @@ package edu.jsu.mcis.cs310.tas_sp25;
 
 /**
  *
+ * <p>Each department includes a unique ID, a description, and an associated terminal ID.
+ * Departments are used to group employees and enforce terminal-based restrictions.</p>
+ * 
  * @author mahinpatel
  */
 public class Department {

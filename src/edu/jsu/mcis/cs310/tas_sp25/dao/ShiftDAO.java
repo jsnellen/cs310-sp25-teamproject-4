@@ -11,6 +11,10 @@ import java.time.DayOfWeek;
  * The `ShiftDAO` class provides methods to interact with the database and
  * retrieve shift-related data. It uses SQL queries to fetch shift details and
  * maps them to `Shift` objects.
+ * 
+ * <p>Provides methods to retrieve a {@code Shift} by ID, badge, or date. Supports
+ * shift overrides through the {@code scheduleoverride} table and maps results
+ * to {@code Shift} and {@code DailySchedule} model objects.</p>
  *
  *
  * @author denzel

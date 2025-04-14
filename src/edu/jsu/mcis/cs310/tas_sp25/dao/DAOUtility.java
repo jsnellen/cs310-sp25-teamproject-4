@@ -21,6 +21,15 @@ import java.util.stream.Collectors;
  * common DAO logic and other repeated and/or standardized code, refactored into
  * individual static methods.
  *
+ * <p>Provides static methods for:
+ * <ul>
+ *   <li>Calculating total worked minutes and absenteeism</li>
+ *   <li>Serializing punch data to JSON</li>
+ * </ul>
+ * 
+ * @author Evan Ranjitkar
+ * @author Tanner Thomas
+ * @author Cole Stephens
  */
 public final class DAOUtility {
 
