@@ -20,7 +20,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
- *
+ * Data Access Object (DAO) for accessing punch (event) records from the database.
+ * 
+ * <p>Provides methods to create new punch events and retrieve existing ones
+ * by punch ID, badge, date, or date range. Maps data from the {@code event} table
+ * to the {@code Punch} model.</p>
+ * 
  * @author evanranjitkar
  */
 public class PunchDAO {

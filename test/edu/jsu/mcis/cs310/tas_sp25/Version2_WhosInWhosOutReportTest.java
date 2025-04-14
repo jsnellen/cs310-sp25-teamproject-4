@@ -6,11 +6,28 @@ import java.time.LocalDateTime;
 import org.junit.*;
 import static org.junit.Assert.*;
 import com.github.cliftonlabs.json_simple.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
+/**
+ * Unit test class for the ReportDAO "Who's In, Who's Out" report. 
+ * 
+ * <p> This class tests the retrieval and correctness of the employees status reports
+ * at a given timestamp and department within the TAS system. It uses JUnit 4 for 
+ * testing and JSON-simple for JSON parsing and comparison.</p>
+ * <p>
+ * The test compares actual report data retrieved from the database with predefined
+ * expected JSON data to verify correctness.</p>
+ * 
+ */
 public class Version2_WhosInWhosOutReportTest {
 
     private ReportDAO reportDAO;
 
+    /**
+     * Sets up the test environment by instantiating a DAOFactory and retrieves the
+     * ReportDAO instance before each test is run.
+     */
     @Before
     public void setup() {
 
@@ -19,6 +36,19 @@ public class Version2_WhosInWhosOutReportTest {
 
     }
     
+    /**
+     * Unit test for the ReportDAO WhosInWhosOut method.
+     * 
+     * <p>This test verifies that the "Who's In, Who's Out" report generated for the 
+     * assembly department at 7:00 AM on September 5th, 2018 and matches a predefined
+     * expected JSON structure.</p>
+     * 
+     * <p>The expected JSON includes a list of employee records indicating their arrival
+     * time, employment type, name, badge ID, shift, and current in/out status.</p>
+     * 
+     * <p>The test deserializes a hard coded JSON string representing the expected result,
+     * retrieves the actual report from the DAO, deserializes it, and compares the two.</p>
+     */
     @Test
     public void testWhosInWhosOutByDepartment1() {
         
@@ -49,6 +79,21 @@ public class Version2_WhosInWhosOutReportTest {
 
     }
 
+    /**
+     * Unit test for the ReportDAO WhosInWhosOut method.
+     * 
+     * <p>This test verifies that the "Who's In, Who's Out" report generated for all 
+     * the departments at 1030 AM on August 2nd, 2018 and matches a predefined
+     * expected JSON structure.
+     * </p>
+     * 
+     * <p>The expected JSON includes a list of employee records indicating their arrival
+     * time, employment type, name, badge ID, shift, and current in/out status.
+     * </p>
+     * 
+     * <p>The test deserializes a hard coded JSON string representing the expected result,
+     * retrieves the actual report from the DAO, deserializes it, and compares the two.
+     */
     @Test
     public void testWhosInWhosOutAll() {
         
@@ -77,6 +122,108 @@ public class Version2_WhosInWhosOutReportTest {
         assertNotNull(jsonActual);
         assertEquals(jsonExpected, jsonActual);
 
+    }
+    /**
+     * Tests the "Who's In Who's Out" report for a department that has no employees.
+     * 
+     * <p>This test verifies that when a valid timestamp is provided but the department ID 
+     * does not correspond to any employees, the resulting JSON array is empty.</p>
+     * 
+     * @author Cole Stephens
+     */
+    @Test
+    public void testWhosInWhosOutEmptyDepartment() {
+        
+        JsonArray jsonActual = null; 
+        
+        try {
+            
+            //Get "Who's In Who's Out" Report (2018-11-1 at 12:00pm, no department)
+            
+            LocalDateTime ts = LocalDateTime.of(2018, 11, 1, 12, 0);
+            
+            String jsonActualString = reportDAO.getWhosInWhosOut(ts, 11);
+            jsonActual = (JsonArray)Jsoner.deserialize(jsonActualString);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        //Compares expected values
+        
+        assertNotNull(jsonActual);
+        assertTrue(jsonActual.isEmpty());
+    }
+    /**
+     * Tests the "Who's In Who's Out" report for a timestamp before ant punch data exists.
+     * 
+     * <p>This test ensures that when requesting the report at a time before any time clock punches
+     * have been recorded, the returned data reflects the default employee status "Out" for all employees.</p>
+     * 
+     * <p>The test deserializes a hard coded JSON string representing the expected result,
+     * retrieves the actual report from the DAO, deserializes it, and compares the two.
+     * 
+     * @author Cole Stephens
+     */
+    @Test
+    public void testWhosInWhosOutBeforeDataStart() {
+        
+        JsonArray jsonActual = null; JsonArray jsonExpected = null;
+        
+        try {
+            
+            String jsonExpectedString = "[{\"firstname\":\"Lillian\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"CEA28723\",\"shift\":\"Shift 1\",\"lastname\":\"Claude\",\"status\":\"Out\"},{\"firstname\":\"Judy\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"8709982E\",\"shift\":\"Shift 1\",\"lastname\":\"Dent\",\"status\":\"Out\"},{\"firstname\":\"Lee\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"639D4185\",\"shift\":\"Shift 1\",\"lastname\":\"Gaines\",\"status\":\"Out\"},{\"firstname\":\"Andrea\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"BE51FA92\",\"shift\":\"Shift 1\",\"lastname\":\"Harris\",\"status\":\"Out\"},{\"firstname\":\"James\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"DFDFE648\",\"shift\":\"Shift 1\",\"lastname\":\"Jinks\",\"status\":\"Out\"},{\"firstname\":\"Harry\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"0B8C3085\",\"shift\":\"Shift 1\",\"lastname\":\"King\",\"status\":\"Out\"},{\"firstname\":\"Ernest\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"99F0C0FA\",\"shift\":\"Shift 1\",\"lastname\":\"Kite\",\"status\":\"Out\"},{\"firstname\":\"Robert\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"4C459F1E\",\"shift\":\"Shift 2\",\"lastname\":\"Knaus\",\"status\":\"Out\"},{\"firstname\":\"Dorothy\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"76E920D9\",\"shift\":\"Shift 2\",\"lastname\":\"Lambert\",\"status\":\"Out\"},{\"firstname\":\"Matthew\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"D2CC71D4\",\"shift\":\"Shift 1\",\"lastname\":\"Lawson\",\"status\":\"Out\"},{\"firstname\":\"Ali\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"8D9E5710\",\"shift\":\"Shift 1\",\"lastname\":\"Melia\",\"status\":\"Out\"},{\"firstname\":\"Mary\",\"employeetype\":\"Full-Time Employee\",\"badgeid\":\"B5A117E9\",\"shift\":\"Shift 1\",\"lastname\":\"Sullivan\",\"status\":\"Out\"},{\"firstname\":\"James\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"D928AFBA\",\"shift\":\"Shift 1\",\"lastname\":\"Ali\",\"status\":\"Out\"},{\"firstname\":\"Veronica\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"8DB842EF\",\"shift\":\"Shift 1\",\"lastname\":\"Arney\",\"status\":\"Out\"},{\"firstname\":\"Kenneth\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"C0063C4C\",\"shift\":\"Shift 1\",\"lastname\":\"Cain\",\"status\":\"Out\"},{\"firstname\":\"George\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"021890C0\",\"shift\":\"Shift 1\",\"lastname\":\"Chapell\",\"status\":\"Out\"},{\"firstname\":\"Tamara\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"BD9BB983\",\"shift\":\"Shift 1\",\"lastname\":\"Dahl\",\"status\":\"Out\"},{\"firstname\":\"Freda\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"C6C1C0F2\",\"shift\":\"Shift 1\",\"lastname\":\"Dickman\",\"status\":\"Out\"},{\"firstname\":\"Gloria\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"6AA1785E\",\"shift\":\"Shift 1\",\"lastname\":\"Ellis\",\"status\":\"Out\"},{\"firstname\":\"Ronald\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"6C0D1549\",\"shift\":\"Shift 1\",\"lastname\":\"Franklin\",\"status\":\"Out\"},{\"firstname\":\"Theresa\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"0886BF12\",\"shift\":\"Shift 1\",\"lastname\":\"Gibson\",\"status\":\"Out\"},{\"firstname\":\"Rose\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"29C3C7D4\",\"shift\":\"Shift 1\",\"lastname\":\"Gomez\",\"status\":\"Out\"},{\"firstname\":\"Rose\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"C278A564\",\"shift\":\"Shift 1\",\"lastname\":\"Hill\",\"status\":\"Out\"},{\"firstname\":\"Wm\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"3C03B8D7\",\"shift\":\"Shift 1\",\"lastname\":\"Howard\",\"status\":\"Out\"},{\"firstname\":\"Larry\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"55BAF4B1\",\"shift\":\"Shift 1\",\"lastname\":\"Hoyt\",\"status\":\"Out\"},{\"firstname\":\"Thomas\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"8A90B9A3\",\"shift\":\"Shift 1\",\"lastname\":\"Kawamoto\",\"status\":\"Out\"},{\"firstname\":\"Tracy\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"1D52BFA2\",\"shift\":\"Shift 1\",\"lastname\":\"Lowery\",\"status\":\"Out\"},{\"firstname\":\"Thomas\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"C8E646D8\",\"shift\":\"Shift 1\",\"lastname\":\"Merrick\",\"status\":\"Out\"},{\"firstname\":\"Marcus\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"45E5059F\",\"shift\":\"Shift 1\",\"lastname\":\"Osborne\",\"status\":\"Out\"},{\"firstname\":\"Rosalee\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"82A8539F\",\"shift\":\"Shift 1\",\"lastname\":\"Patterson\",\"status\":\"Out\"},{\"firstname\":\"Earl\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"618072EA\",\"shift\":\"Shift 1\",\"lastname\":\"Perales\",\"status\":\"Out\"},{\"firstname\":\"Elaine\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"6CA0FF4A\",\"shift\":\"Shift 1\",\"lastname\":\"Pierce\",\"status\":\"Out\"},{\"firstname\":\"Sandra\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"BAD139D6\",\"shift\":\"Shift 1\",\"lastname\":\"Sutherland\",\"status\":\"Out\"},{\"firstname\":\"Kelly\",\"employeetype\":\"Temporary Employee\",\"badgeid\":\"E6386C7C\",\"shift\":\"Shift 1\",\"lastname\":\"Teel\",\"status\":\"Out\"}]";
+            jsonExpected = (JsonArray)Jsoner.deserialize(jsonExpectedString);
+            
+            //Get "Who's In Who's Out" Report (2017-01-01 at 12:00am, no punches
+            
+            LocalDateTime ts = LocalDateTime.of(2017, 1, 1, 0, 0);
+            
+            String jsonActualString = reportDAO.getWhosInWhosOut(ts, 1);
+            jsonActual = (JsonArray)Jsoner.deserialize(jsonActualString);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        //Compares expected values
+        
+        assertNotNull(jsonExpected);
+        assertNotNull(jsonActual);
+        assertEquals(jsonExpected, jsonActual);
+       
+    }
+    /**
+     * Tests the "Who's In Who's Out" report for an invalid department ID.
+     * 
+     * <p>This test verifies that when an invalid department ID is passed to the report
+     * retrieval method, the resulting JSON array is empty, indicating no employees found for 
+     * the invalid department input.</p>
+     * 
+     * @author Cole Stephens
+     */
+    @Test
+    public void testWhosInWhosOutInvalidDepartment() {
+        
+        JsonArray jsonActual = null;
+        
+        try {
+            
+            //Get "Who's In Who's Out" Report (2018-09-05 at 8:00am, negative department
+            
+            LocalDateTime ts = LocalDateTime.of(2018, 9, 5, 8, 0);
+        
+            String jsonActualString = reportDAO.getWhosInWhosOut(ts, -1);
+            jsonActual = (JsonArray)Jsoner.deserialize(jsonActualString);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        //Compares expected values
+        
+        assertNotNull(jsonActual);
+        assertTrue(jsonActual.isEmpty());
     }
     
 }

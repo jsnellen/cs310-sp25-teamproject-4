@@ -3,7 +3,10 @@ import java.util.zip.CRC32;
 
 /**
  * Represents an employee badge, including a unique badge ID and a descriptive label.
- * A badge ID may be provided directly or generated automatically using a CRC32 checksum.
+ * 
+ * <p>Each badge includes a unique ID and a descriptive label. The ID can be 
+ * provided manually or generated automatically using a CRC32 checksum 
+ * based on the description.</p>
  * 
  * @author Evan Ranjitkar
  */
