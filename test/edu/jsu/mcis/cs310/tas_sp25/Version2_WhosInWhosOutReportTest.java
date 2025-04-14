@@ -7,10 +7,27 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import com.github.cliftonlabs.json_simple.*;
 
+/**
+ * Unit test class for the ReportDAO "Who's In, Who's Out" report. 
+ * 
+ * <p> This class tests the retrieval and correctness of the employees status reports
+ * at a given timestamp and department within the TAS system. It uses JUnit 4 for 
+ * testing and JSON-simple for JSON parsing and comparison.
+ * </p>
+ * <p>
+ * The test compares actual report data retrieved from the database with predefined
+ * expected JSON data to verify correctness
+ * </p>
+ * 
+ */
 public class Version2_WhosInWhosOutReportTest {
 
     private ReportDAO reportDAO;
 
+    /**
+     * Sets up the test environment by instantiating a DAOFactory and retrieves the
+     * ReportDAO instance before each test is run.
+     */
     @Before
     public void setup() {
 
@@ -19,6 +36,19 @@ public class Version2_WhosInWhosOutReportTest {
 
     }
     
+    /**
+     * Unit test for the ReportDAO WhosInWhosOut method.
+     * 
+     * <p>This test verifies that the "Who's In, Who's Out" report generated for the 
+     * assembly department at 7:00 AM on September 5th, 2018 and matches a predefined
+     * expected JSON structure.
+     * </p>
+     * <p>The expected JSON includes a list of employee records indicating their arrival
+     * time, employment type, name, badge ID, shift, and current in/out status.
+     * </p>
+     * <p>The test deserializes a hard coded JSON string representing the expected result,
+     * retrieves the actual report from the DAO, deserializes it, and compares the two.
+     */
     @Test
     public void testWhosInWhosOutByDepartment1() {
         
@@ -49,6 +79,19 @@ public class Version2_WhosInWhosOutReportTest {
 
     }
 
+    /**
+     * Unit test for the ReportDAO WhosInWhosOut method.
+     * 
+     * <p>This test verifies that the "Who's In, Who's Out" report generated for all 
+     * the departments at 1030 AM on August 2nd, 2018 and matches a predefined
+     * expected JSON structure.
+     * </p>
+     * <p>The expected JSON includes a list of employee records indicating their arrival
+     * time, employment type, name, badge ID, shift, and current in/out status.
+     * </p>
+     * <p>The test deserializes a hard coded JSON string representing the expected result,
+     * retrieves the actual report from the DAO, deserializes it, and compares the two.
+     */
     @Test
     public void testWhosInWhosOutAll() {
         
