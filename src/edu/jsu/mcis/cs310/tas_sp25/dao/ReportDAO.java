@@ -22,7 +22,7 @@ public class ReportDAO{
         this.daoFactory = daoFactory;
     }
     
-    private static final String Query_GETID = "SELECT badge.id as badgeId, badge.description AS employeeName, "
+    private static final String Query_GET_BADGE_BY_ID = "SELECT badge.id as badgeId, badge.description AS employeeName, "
             + "department.description AS departmentName, employeetype.description AS employeeType "
             + "FROM badge JOIN employee ON badge.id = employee.badgeid "
             + "JOIN department ON employee.departmentid = department.id "
@@ -30,16 +30,51 @@ public class ReportDAO{
             + "WHERE departmentid = ? "
             + "ORDER BY badge.description";
     
-    private static final String Query_GETNULL = "SELECT badge.id as badgeId, badge.description AS employeeName,"
+    private static final String Query_GET_BADGE_BY_NULL = "SELECT badge.id as badgeId, badge.description AS employeeName,"
             + " department.description AS departmentName, employeetype.description AS employeeType "
             + "FROM badge JOIN employee ON badge.id = employee.badgeid "
             + "JOIN department ON employee.departmentid = department.id "
             + "JOIN employeetype ON employee.employeetypeid = employeetype.id "
             + "ORDER BY badge.description";
     
-    private static final String Query_GET_HOURS = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
+    private static final String Query_GET_HOURS_WITH_ID_AND_TYPE = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
             + ", employee.lastname AS lastName, department.description AS departmentName,"
-            + " employeetype.description AS employeeType, shift.description AS assignedShift";
+            + " employeetype.description AS employeeType, shift.description AS assignedShift"
+            + " FROM employee JOIN department ON employee.departmentid = department.id"
+            + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
+            + " JOIN shift ON employee.shiftid = shift.id"
+            + " JOIN event ON employee.badgeid = event.badgeid"
+            + " WHERE departmentid = ? AND (timestamp >= ? AND timestamp <= ?) AND (employeetypeid = ?))"
+            + " ORDER BY lastname, firstname, middlename";
+    
+    private static final String Query_GET_HOURS_WITH_ID = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
+            + ", employee.lastname AS lastName, department.description AS departmentName,"
+            + " employeetype.description AS employeeType, shift.description AS assignedShift"
+            + " FROM employee JOIN department ON employee.departmentid = department.id"
+            + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
+            + " JOIN shift ON employee.shiftid = shift.id"
+            + " WHERE departmentid = ? AND (timestamp >= ? AND timestamp <= ?)"
+            + " ORDER BY lastname, firstname, middlename";
+    
+    private static final String Query_GET_HOURS_WITH_TYPE = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
+            + ", employee.lastname AS lastName, department.description AS departmentName,"
+            + " employeetype.description AS employeeType, shift.description AS assignedShift"
+            + " FROM employee JOIN department ON employee.departmentid = department.id"
+            + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
+            + " JOIN shift ON employee.shiftid = shift.id"
+            + " JOIN event ON employee.badgeid = event.badgeid"
+            + " WHERE timestamp >= ? AND timestamp <= ?) AND (employeetypeid = ?))"
+            + " ORDER BY lastname, firstname, middlename";
+    
+    private static final String Query_GET_HOURS_ALL = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
+            + ", employee.lastname AS lastName, department.description AS departmentName,"
+            + " employeetype.description AS employeeType, shift.description AS assignedShift"
+            + " FROM employee JOIN department ON employee.departmentid = department.id"
+            + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
+            + " JOIN shift ON employee.shiftid = shift.id"
+            + " JOIN event ON employee.badgeid = event.badgeid"
+            + " WHERE timestamp >= ? AND timestamp <= ?)"
+            + " ORDER BY lastname, firstname, middlename";
     
     public String getBadgeSummary(Integer departmentId){
         
@@ -57,11 +92,11 @@ public class ReportDAO{
 
                 if(departmentId != null){
                     
-                     ps = conn.prepareStatement(Query_GETID);
+                     ps = conn.prepareStatement(Query_GET_BADGE_BY_ID);
                      ps.setInt(1, departmentId);
                      
                 } else {
-                    ps = conn.prepareStatement(Query_GETNULL);
+                    ps = conn.prepareStatement(Query_GET_BADGE_BY_NULL);
                 }
                 
                 // Executing the PreparedStatement
@@ -113,24 +148,24 @@ public class ReportDAO{
             
              if (conn.isValid(0)) {
 
-                if(departmentId != null){
+                if(departmentId != null && employeeType != null){
                     
-                     ps = conn.prepareStatement(Query_GETID);
+                     ps = conn.prepareStatement(Query_GET_HOURS_WITH_ID_AND_TYPE);
                      ps.setInt(1, departmentId);
                      
-                } else {
-                    ps = conn.prepareStatement(Query_GETNULL);
-                }
-                
-                if(departmentId != null){
+                } else if (departmentId != null && employeeType == null) {
                     
-                     ps = conn.prepareStatement(Query_GETID);
-                     ps.setInt(1, departmentId);
-                     
+                    ps = conn.prepareStatement(Query_GET_HOURS_WITH_ID);
+                    
+                } else if (departmentId == null && employeeType != null){
+                    
+                    ps = conn.prepareStatement(Query_GET_HOURS_WITH_TYPE);
+                    
                 } else {
-                    ps = conn.prepareStatement(Query_GETNULL);
+                    ps = conn.prepareStatement(Query_GET_HOURS_ALL);
                 }
                 
+              
                 // Executing the PreparedStatement
                 boolean hasResults = ps.execute();
 
