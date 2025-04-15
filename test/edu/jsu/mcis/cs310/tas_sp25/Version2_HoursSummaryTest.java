@@ -43,6 +43,7 @@ public class Version2_HoursSummaryTest {
         
         /* Compare to Expected Values */
         
+        System.out.println(jsonActual);
         assertNotNull(jsonExpected);
         assertNotNull(jsonActual);
         assertEquals(jsonExpected, jsonActual);
