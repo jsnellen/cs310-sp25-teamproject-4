@@ -63,6 +63,7 @@ public class ShiftDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     shift = mapResultSetToShift(resultSet);
+                    
                 }
             }
         } catch (SQLException e) {
