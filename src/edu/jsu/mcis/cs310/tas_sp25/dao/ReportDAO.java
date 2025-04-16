@@ -3,7 +3,12 @@ package edu.jsu.mcis.cs310.tas_sp25.dao;
 import com.github.cliftonlabs.json_simple.JsonArray;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsoner;
+import edu.jsu.mcis.cs310.tas_sp25.Badge;
 import edu.jsu.mcis.cs310.tas_sp25.EmployeeType;
+import edu.jsu.mcis.cs310.tas_sp25.Punch;
+import edu.jsu.mcis.cs310.tas_sp25.Shift;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -51,7 +56,7 @@ public class ReportDAO{
     
     private static final String Query_GET_HOURS_WITH_ID_AND_TYPE = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
             + ", employee.lastname AS lastName, department.description AS departmentName,"
-            + " employeetype.description AS employeeType, shift.description AS assignedShift"
+            + " employeetype.description AS employeeType, shift.description AS assignedShift, employee.badgeid AS badgeId"
             + " FROM employee JOIN department ON employee.departmentid = department.id"
             + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
             + " JOIN shift ON employee.shiftid = shift.id"
@@ -61,7 +66,7 @@ public class ReportDAO{
     
     private static final String Query_GET_HOURS_WITH_ID = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
             + ", employee.lastname AS lastName, department.description AS departmentName,"
-            + " employeetype.description AS employeeType, shift.description AS assignedShift"
+            + " employeetype.description AS employeeType, shift.description AS assignedShift, employee.badgeid AS badgeId"
             + " FROM employee JOIN department ON employee.departmentid = department.id"
             + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
             + " JOIN shift ON employee.shiftid = shift.id"
@@ -71,7 +76,7 @@ public class ReportDAO{
     
     private static final String Query_GET_HOURS_WITH_TYPE = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
             + ", employee.lastname AS lastName, department.description AS departmentName,"
-            + " employeetype.description AS employeeType, shift.description AS assignedShift"
+            + " employeetype.description AS employeeType, shift.description AS assignedShift, employee.badgeid AS badgeId"
             + " FROM employee JOIN department ON employee.departmentid = department.id"
             + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
             + " JOIN shift ON employee.shiftid = shift.id"
@@ -81,7 +86,7 @@ public class ReportDAO{
     
     private static final String Query_GET_HOURS_ALL = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
             + ", employee.lastname AS lastName, department.description AS departmentName,"
-            + " employeetype.description AS employeeType, shift.description AS assignedShift"
+            + " employeetype.description AS employeeType, shift.description AS assignedShift, employee.badgeid AS badgeId"
             + " FROM employee JOIN department ON employee.departmentid = department.id"
             + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
             + " JOIN shift ON employee.shiftid = shift.id"
@@ -184,6 +189,16 @@ public class ReportDAO{
             
             Connection conn = daoFactory.getConnection();
             
+            // Getting a BadgeDAO instance from the daoFactory
+            BadgeDAO badgeDAO = daoFactory.getBadgeDAO();   
+                    
+            // Getting a BadgeDAO instance from the daoFactory
+            PunchDAO punchDAO = daoFactory.getPunchDAO();  
+                    
+            // Getting a BadgeDAO instance from the daoFactory
+            ShiftDAO shiftDAO = daoFactory.getShiftDAO();   
+            
+            
              if (conn.isValid(0)) {
 
                 if(departmentId != null && employeeType != null){
@@ -232,9 +247,22 @@ public class ReportDAO{
                     result.put("shift",rs.getString("assignedShift"));
                     result.put("name", (rs.getString("lastname")+", " + rs.getString("firstname")+ " " + rs.getString("middlename")));
                     result.put("middlename", rs.getString("middlename"));
-                    result.put("department",rs.getString("departmentName"));
                     
-                    resultArray.add(result);
+                    Badge badge = badgeDAO.find(rs.getString("badgeId"));
+
+                    ArrayList<Punch> punchList = punchDAO.list(badge, begin, end);
+                    
+                    Shift shift = shiftDAO.find(badge, date);
+                    
+                   BigDecimal regularMinutes = BigDecimal.valueOf(DAOUtility.calculateTotalMinutes(punchList, shift));
+                   
+                   BigDecimal regularHours = regularMinutes.divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+                   result.put("regular", regularHours);
+
+                   result.put("department",rs.getString("departmentName"));
+                   resultArray.add(result);
+                   
+                   System.out.println(result);
                 }
                 
               }
@@ -249,6 +277,7 @@ public class ReportDAO{
             
         }
         
+        System.out.println(Jsoner.serialize(resultArray));
         return Jsoner.serialize(resultArray);
     }
     /**
