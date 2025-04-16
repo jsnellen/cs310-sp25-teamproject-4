@@ -20,6 +20,7 @@ public class PunchList_IntervalTest {
 /**
  *
  * @author evanranjitkar
+ *  @author mahin patel
  */
     @Test
     public void testFindPunchList1() {
@@ -81,6 +82,63 @@ public class PunchList_IntervalTest {
         assertEquals(s2.toString(), s1.toString());
 
     }
+    
+    @Test
+    public void testFindPunchList2() {
+
+        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+
+        /* Create StringBuilders for Test Output */
+        
+        StringBuilder s1 = new StringBuilder();
+        StringBuilder s2 = new StringBuilder();
+
+        /* Create Timestamp and Badge Objects for Punch List */
+        
+        LocalDate st = LocalDate.of(2018, Month.AUGUST, 4);
+        LocalDate et = LocalDate.of(2018, Month.AUGUST, 7);
+
+        Badge b = badgeDAO.find("28DC3FB8");
+
+        /* Retrieve Punch List #1 (created by DAO) */
+        
+        ArrayList<Punch> p1 = punchDAO.list(b, st, et);
+
+        /* Export Punch List #1 Contents to StringBuilder */
+        
+        for (Punch p : p1) {
+            s1.append(p.printOriginal());
+            s1.append("\n");
+        }
+
+        /* Create Punch List #2 (created manually) */
+        
+        ArrayList<Punch> p2 = new ArrayList<>();
+
+        /* Add Punches */
+        p2.add(punchDAO.find(497));
+        p2.add(punchDAO.find(548));
+        p2.add(punchDAO.find(550));
+        p2.add(punchDAO.find(567));
+        p2.add(punchDAO.find(602));
+        p2.add(punchDAO.find(656));
+        p2.add(punchDAO.find(661));
+        p2.add(punchDAO.find(674));
+        /* Export Punch List #2 Contents to StringBuilder */
+        
+        for (Punch p : p2) {
+            s2.append(p.printOriginal());
+            s2.append("\n");
+        }
+
+        /* Compare Output Strings */
+        
+        assertEquals(s2.toString(), s1.toString());
+
+    }
+    
+    
 
 }
 
