@@ -297,19 +297,19 @@ public class ReportDAO {
 
                             BigDecimal overtimeHours = BigDecimal.valueOf(0);
 
-                            if (workedHours.compareTo(regularHours) > 0) {
+                            if (workedHours.compareTo(regularHours) == 1) {
 
                                 overtimeHours = workedHours.subtract(regularHours);
-                                
+                                workedHours = regularHours;
                             }
 
                             // Using the setScale method for two decimal places
-                            regularHours.setScale(2);
-                            overtimeHours.setScale(2);
+                            workedHours = workedHours.setScale(2);
+                            overtimeHours = overtimeHours.setScale(2);
                             
                             result.put("overtime", overtimeHours.toString());
                             result.put("department", rs.getString("departmentName"));
-                            result.put("regular", regularHours.toString());
+                            result.put("regular", workedHours.toString());
                             result.put("lastname", rs.getString("lastName"));
 
                             // Adding the JsonObject to the JsonArray
