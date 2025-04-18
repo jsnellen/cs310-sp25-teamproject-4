@@ -44,7 +44,6 @@ public class AbsenteeismDAO {
     private static final String Query_FIND = "SELECT * FROM absenteeism WHERE employeeid = ? AND payperiod = ?";
     private static final String Query_INSERT = "INSERT INTO absenteeism (employeeid, payperiod, percentage) VALUES (?,?,?)" 
                                                 + "ON DUPLICATE KEY UPDATE percentage = ?";
-    private static final String QUERY_CLEAR = "DELETE FROM absenteeism WHERE employeeid = ?";
     
     /**
          * Retrieves the absenteeism record for a given employee and pay period start date. 
@@ -150,34 +149,6 @@ public class AbsenteeismDAO {
             if (ps != null) { try { ps.close(); } catch (Exception e) { e.printStackTrace(); } }
             
         }
-    }
-    
-    /**
-     * Clears all absenteeism records for a given employee from the database.
-     * 
-     * @param employeeId The ID of the employee whose absenteeism records should be cleared.
-     * @author Cole Stephens
-     */
-    public void clear(Integer employeeId) {
-        
-        PreparedStatement ps = null;
-        
-        try {
-            Connection conn = daoFactory.getConnection();
-            
-            if (conn.isValid(0)) {
-                
-                ps = conn.prepareStatement(QUERY_CLEAR);
-                ps.setInt(1, employeeId);
-                
-                int rowsAffected = ps.executeUpdate();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (ps != null) {try {ps.close(); } catch (Exception e) {e.printStackTrace(); } }
-        }
-        
     }
    
 }

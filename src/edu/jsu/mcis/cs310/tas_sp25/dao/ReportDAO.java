@@ -55,46 +55,6 @@ public class ReportDAO{
             + "JOIN employeetype ON employee.employeetypeid = employeetype.id "
             + "ORDER BY badge.description";
     
-    private static final String Query_GET_HOURS_WITH_ID_AND_TYPE = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
-            + ", employee.lastname AS lastName, department.description AS departmentName,"
-            + " employeetype.description AS employeeType, shift.description AS assignedShift"
-            + " FROM employee JOIN department ON employee.departmentid = department.id"
-            + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
-            + " JOIN shift ON employee.shiftid = shift.id"
-            + " JOIN event ON employee.badgeid = event.badgeid"
-            + " WHERE departmentid = ? AND ((DATE(timestamp) BETWEEN ? AND ?) AND (employeetypeid = ?))"
-            + " ORDER BY lastname, firstname, middlename";
-    
-    private static final String Query_GET_HOURS_WITH_ID = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
-            + ", employee.lastname AS lastName, department.description AS departmentName,"
-            + " employeetype.description AS employeeType, shift.description AS assignedShift"
-            + " FROM employee JOIN department ON employee.departmentid = department.id"
-            + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
-            + " JOIN shift ON employee.shiftid = shift.id"
-            + " JOIN event ON employee.badgeid = event.badgeid"
-            + " WHERE departmentid = ? AND (DATE(timestamp) BETWEEN ? AND ?)"
-            + " ORDER BY lastname, firstname, middlename";
-    
-    private static final String Query_GET_HOURS_WITH_TYPE = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
-            + ", employee.lastname AS lastName, department.description AS departmentName,"
-            + " employeetype.description AS employeeType, shift.description AS assignedShift"
-            + " FROM employee JOIN department ON employee.departmentid = department.id"
-            + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
-            + " JOIN shift ON employee.shiftid = shift.id"
-            + " JOIN event ON employee.badgeid = event.badgeid"
-            + " WHERE (DATE(timestamp) BETWEEN ? AND ?) AND (employeetypeid = ?)"
-            + " ORDER BY lastname, firstname, middlename";
-    
-    private static final String Query_GET_HOURS_ALL = "SELECT employee.firstname AS firstName, employee.middlename AS middleName"
-            + ", employee.lastname AS lastName, department.description AS departmentName,"
-            + " employeetype.description AS employeeType, shift.description AS assignedShift"
-            + " FROM employee JOIN department ON employee.departmentid = department.id"
-            + " JOIN employeetype ON employee.employeetypeid = employeetype.id"
-            + " JOIN shift ON employee.shiftid = shift.id"
-            + " JOIN event ON employee.badgeid = event.badgeid"
-            + " WHERE DATE(timestamp) BETWEEN ? AND ?"
-            + " ORDER BY lastname, firstname, middlename";
-    
     private static final String QUERY_WHOS_IN_WHOS_OUT = "SELECT employee.badgeid AS badgeId, badge.description AS employeeName, "
             + "employee.firstname AS firstname, employee.lastname AS lastname, employeetype.description AS employeeType,"
             + "shift.description AS shift, event.timestamp AS arrived, eventtype.description AS eventType "
@@ -106,19 +66,6 @@ public class ReportDAO{
             + "LEFT JOIN eventtype ON event.eventtypeid = eventtype.id "
             + "WHERE (? IS NULL OR employee.departmentid = ?) "
             + "ORDER BY employee.lastname, employee.firstname, event.timestamp DESC";
-    
-    private static final String QUERY_EMPLOYEE_INFO = "SELECT employee.firstname, employee.middlename, employee.lastname, badge.id AS badgeid, "
-            + "department.description AS department "
-            + "FROM employee "
-            + "JOIN badge ON employee.badgeid = badge.id "
-            + "JOIN department ON employee.departmentid = department.id "
-            + "WHERE employee.id = ? ";
-    
-    private static final String QUERY_ABSENTEEISM_HISTORY = "SELECT payperiod, percentage "
-            + "FROM absenteeism "
-            + "WHERE employeeid = ? "
-            + "ORDER BY payperiod DESC "
-            + "LIMIT 12 ";
     
     /**
      * Retrieves a summary of employee badge information for a specified department.
@@ -188,88 +135,6 @@ public class ReportDAO{
         return Jsoner.serialize(resultArray);
     }
     
-    
-    public String getHoursSummary(LocalDate date, Integer departmentId, EmployeeType employeeType){
-        
-        JsonArray resultArray = new JsonArray();
-        
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        
-        LocalDate begin = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
-        LocalDate end = begin.with(TemporalAdjusters.next(DayOfWeek.SATURDAY));
-        
-        try {
-            
-            Connection conn = daoFactory.getConnection();
-            
-             if (conn.isValid(0)) {
-
-                if(departmentId != null && employeeType != null){
-                    
-                     ps = conn.prepareStatement(Query_GET_HOURS_WITH_ID_AND_TYPE);
-                     ps.setInt(1, departmentId);
-                     ps.setDate(2, java.sql.Date.valueOf(begin));
-                     ps.setDate(3, java.sql.Date.valueOf(end));
-                     ps.setInt(4, employeeType.ordinal());
-                     
-                } else if (departmentId != null) {
-                    
-                    ps = conn.prepareStatement(Query_GET_HOURS_WITH_ID);
-                    ps.setInt(1, departmentId);
-                    ps.setDate(2, java.sql.Date.valueOf(begin));
-                    ps.setDate(3, java.sql.Date.valueOf(end));
-                    
-                } else if (employeeType != null){
-                    
-                    ps = conn.prepareStatement(Query_GET_HOURS_WITH_TYPE);
-                    ps.setDate(1, java.sql.Date.valueOf(begin));
-                    ps.setDate(2, java.sql.Date.valueOf(end));
-                    ps.setInt(3, employeeType.ordinal());
-                    
-                } else {
-                    ps = conn.prepareStatement(Query_GET_HOURS_ALL);
-                    ps.setDate(1, java.sql.Date.valueOf(begin));
-                    ps.setDate(2, java.sql.Date.valueOf(end));
-                }
-                
-              
-                // Executing the PreparedStatement
-                boolean hasResults = ps.execute();
-
-                // If query has results, then retrieving the data
-                if (hasResults){
-                    
-                // Getting result set and storing it in the ResultSet variable
-                rs = ps.getResultSet();
-                    
-                while(rs.next()){
-                    
-                    JsonObject result = new JsonObject();
-                    
-                    result.put("employeetype",rs.getString("employeetype"));
-                    result.put("shift",rs.getString("assignedShift"));
-                    result.put("name", (rs.getString("lastname")+", " + rs.getString("firstname")+ " " + rs.getString("middlename")));
-                    result.put("middlename", rs.getString("middlename"));
-                    result.put("department",rs.getString("departmentName"));
-                    
-                    resultArray.add(result);
-                }
-                
-              }
-           }
-        }
-        catch (Exception e) { e.printStackTrace(); }
-        
-        finally {
-            
-            if (rs != null) { try { rs.close(); } catch (Exception e) { e.printStackTrace(); } }
-            if (ps != null) { try { ps.close(); } catch (Exception e) { e.printStackTrace(); } }
-            
-        }
-        
-        return Jsoner.serialize(resultArray);
-    }
     /**
      * Generates a JSON report listing which employees are clocked ("In")
      * and which are clocked ("Out") at a specific date and time. Optionally filters
@@ -281,7 +146,6 @@ public class ReportDAO{
      * 
      * @author Cole Stephens
      */
-    
     public String getWhosInWhosOut(LocalDateTime dateTime, Integer departmentId) {
         
     JsonArray resultArray = new JsonArray(); //Result array to hold the final JSON objects
@@ -379,100 +243,16 @@ public class ReportDAO{
     return Jsoner.serialize(resultArray);
 }
 
-/**
- * Helper method to determine employee "In" or "Out" status based on event type. 
- * 
- * @param eventType The event type string from the database
- * @return "In" if event type is "Clock In", otherwise "Out"
- * 
- * @author Cole Stephens
+    /**
+    * Helper method to determine employee "In" or "Out" status based on event type. 
+    * 
+    * @param eventType The event type string from the database
+    * @return "In" if event type is "Clock In", otherwise "Out"
+    * 
+    * @author Cole Stephens
  */
-private String determineInOut(String eventType) {
-    return "Clock In".equals(eventType) ? "In" : "Out";
-}
+    private String determineInOut(String eventType) {
+        return "Clock In".equals(eventType) ? "In" : "Out";
+    }
     
-   public String getAbsenteeismHistory(Integer employeeId) {
-       
-       PreparedStatement psEmployee = null;
-       PreparedStatement psAbsenteeism = null;
-       ResultSet rsEmployee = null;
-       ResultSet rsAbsenteeism = null;
-       
-       JsonObject result = new JsonObject();
-       JsonArray historyArray = new JsonArray();
-       
-       BigDecimal lifetimeTotal = BigDecimal.ZERO;
-       int recordCount = 0;
-       
-       try {
-           Connection conn = daoFactory.getConnection();
-           
-           if (conn.isValid(0)) {
-               
-               psEmployee = conn.prepareStatement(QUERY_EMPLOYEE_INFO);
-               psEmployee.setInt(1, employeeId);
-               rsEmployee = psEmployee.executeQuery();
-               
-               if (rsEmployee.next()) {
-                   String firstname = rsEmployee.getString("firstname");
-                   String middlename = rsEmployee.getString("middlename");
-                   String lastname = rsEmployee.getString("lastname");
-                   
-                   if (middlename == null) middlename = "";
-                   
-                   String name = lastname + ", " + firstname + " " + middlename.trim();
-                   
-                   result.put("name", name.trim());
-                   result.put("badgeid", rsEmployee.getString("badgeid"));
-                   result.put("department", rsEmployee.getString("department"));
-               }
-               
-               psAbsenteeism = conn.prepareStatement(QUERY_ABSENTEEISM_HISTORY);
-               psAbsenteeism.setInt(1, employeeId);
-               rsAbsenteeism = psAbsenteeism.executeQuery();
-               
-               List<JsonObject> tempRecords = new ArrayList<>();
-               
-               while (rsAbsenteeism.next()) {
-                   LocalDate payPeriod = rsAbsenteeism.getDate("payperiod").toLocalDate();
-                   BigDecimal percentage = rsAbsenteeism.getBigDecimal("percentage").setScale(2, RoundingMode.HALF_UP);
-                   
-                   JsonObject record = new JsonObject();
-                   record.put("payperiod", payPeriod.toString());
-                   record.put("percentage", percentage.toString());
-                   
-                   tempRecords.add(record);
-               }
-               
-               Collections.reverse(tempRecords);
-               
-               for (JsonObject record : tempRecords) {
-                   
-                   BigDecimal percentage = new BigDecimal(record.get("percentage").toString());
-                   
-                   lifetimeTotal = lifetimeTotal.add(percentage);
-                   recordCount++;
-                   
-                   BigDecimal lifetimeAverage = lifetimeTotal.divide(new BigDecimal(recordCount), 2, RoundingMode.HALF_UP);
-                   
-                   record.put("lifetime", lifetimeAverage.toString());
-               }
-               
-               Collections.reverse(tempRecords);
-               
-               historyArray.addAll(tempRecords);
-               
-               result.put("absenteeismhistory", historyArray);
-           }
-       } catch (Exception e) {
-           e.printStackTrace();
-       } finally {
-           if (rsEmployee != null) { try {rsEmployee.close(); } catch (Exception e) { e.printStackTrace(); } }
-           if (psEmployee != null) { try {psEmployee.close(); } catch (Exception e) { e.printStackTrace(); } }
-           if (rsAbsenteeism != null) { try {rsAbsenteeism.close(); } catch (Exception e) { e.printStackTrace(); } }
-           if (psAbsenteeism != null) { try {psAbsenteeism.close(); } catch (Exception e) { e.printStackTrace(); } }
-       }
-       
-       return Jsoner.serialize(result);
-   } 
 }

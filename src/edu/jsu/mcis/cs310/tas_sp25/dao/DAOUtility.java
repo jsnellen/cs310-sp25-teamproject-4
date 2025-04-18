@@ -100,11 +100,7 @@ public final class DAOUtility {
                             dailyMinutes += ChronoUnit.MINUTES.between(clockInTime, clockOutTime);
                             
                             long rawMinutes = ChronoUnit.MINUTES.between(clockInTime, clockOutTime);
-                            System.out.println("Date: " + date);
-                            System.out.println("In: " + clockInTime);
-                            System.out.println("Out: " + clockOutTime);
-                            System.out.println("RawMinutes: " + rawMinutes);
-
+                          
                             isClockedIn = false;
                              
                             // Track latest clock out
@@ -134,14 +130,10 @@ public final class DAOUtility {
                     if (!earliestIn.isAfter(lunchStart) && latestOut.isAfter(lunchStop)) {
                         dailyMinutes -= lunchDuration;
                         
-                        System.out.println("In: " + clockInTime);
-                        System.out.println("Out: " + clockOutTime);
-                        System.out.println("DailyMinutes: " + dailyMinutes);
                     }
                 }
 
                 totalMinutes += dailyMinutes;
-                System.out.println("Total Minutes: " + totalMinutes);
             }
 
             return totalMinutes;
@@ -186,16 +178,11 @@ public final class DAOUtility {
 
             int dailyMinutes = (int) schedule.getShiftduration() - (int) schedule.getLunchduration();
             scheduledMinutesToWork += dailyMinutes;
-//            System.out.println(dailyMinutes);
-//            System.out.println(scheduledMinutesToWork);
-
+            
         }
 
         double resultPercentage = 100.0 * (scheduledMinutesToWork - totalMinutesWorked) / scheduledMinutesToWork;
 
-//        System.out.println("TotalMinutesWorked: " + totalMinutesWorked);
-//        System.out.println("ScheduledMinutesToWork: " + scheduledMinutesToWork);
-//        System.out.println("ResultPercentage: " + resultPercentage);
         return BigDecimal.valueOf(resultPercentage);
     }
 
