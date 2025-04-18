@@ -55,7 +55,7 @@ public final class DAOUtility {
         Map<LocalDate, List<Punch>> punchesByDay = dailyPunchList.stream()
                 .collect(Collectors.groupingBy(p -> p.getAdjustedTimeStamp().toLocalDate()));
 
-        //Iterate through each day's punches, retreving the list of punches for that day. ~Cole Stephens
+        //Iterate through each day's punches, retreving the list of punches for that day. ~Cole Stephens, Tanner Thomas
         for (LocalDate date : punchesByDay.keySet()) {
             List<Punch> dailyPunches = punchesByDay.get(date);
             dailyPunches.sort(Comparator.comparing(p -> p.getAdjustedTimeStamp()));
