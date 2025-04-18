@@ -4,8 +4,6 @@
  */
 package edu.jsu.mcis.cs310.tas_sp25;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -51,19 +49,7 @@ public class DailySchedule {
         
         //Calculate the duration of the lunch break and shift
         this.lunchduration = ChronoUnit.MINUTES.between(lunchstart, lunchstop);
-        
-        LocalDateTime start = LocalDateTime.of(LocalDate.now(), shiftstart);
-        LocalDateTime stop = LocalDateTime.of(LocalDate.now(), shiftstop);
-        
-        if (shiftstop.isBefore(shiftstart)) {
-            // Overnight shift: add 1 day to shiftstop
-            stop = stop.plusDays(1);
-        }
-
-        this.shiftduration = ChronoUnit.MINUTES.between(start, stop);
-
-
-        
+        this.shiftduration = ChronoUnit.MINUTES.between(shiftstart, shiftstop);
     }
     
     //Getters methods for accessing shift properties

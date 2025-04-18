@@ -61,8 +61,11 @@ public class JSONTest {
 
     @Test
     public void testJSONShift1Weekend() {
+
         try {
+
             BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
+
             PunchDAO punchDAO = daoFactory.getPunchDAO();
             ShiftDAO shiftDAO = daoFactory.getShiftDAO();
 
@@ -90,9 +93,11 @@ public class JSONTest {
 
             /* Compare to Expected JSON */
             assertEquals(expected, actual);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     @Test
@@ -134,11 +139,12 @@ public class JSONTest {
         }
 
     }
-
+    
     /**
      *
      * @author mahinpatel
      */
+    
     @Test
     public void testJSONShift2Weekend() {
 

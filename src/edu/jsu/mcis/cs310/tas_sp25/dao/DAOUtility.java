@@ -98,8 +98,15 @@ public final class DAOUtility {
                         if (isClockedIn) {
                             clockOutTime = punch.getAdjustedTimeStamp().toLocalTime();
                             dailyMinutes += ChronoUnit.MINUTES.between(clockInTime, clockOutTime);
-                            isClockedIn = false;
+                            
+                            long rawMinutes = ChronoUnit.MINUTES.between(clockInTime, clockOutTime);
+                            System.out.println("Date: " + date);
+                            System.out.println("In: " + clockInTime);
+                            System.out.println("Out: " + clockOutTime);
+                            System.out.println("RawMinutes: " + rawMinutes);
 
+                            isClockedIn = false;
+                             
                             // Track latest clock out
                             if (latestOut == null || clockOutTime.isAfter(latestOut)) {
                                 latestOut = clockOutTime;
@@ -126,10 +133,15 @@ public final class DAOUtility {
                 if (dailyMinutes > lunchThreshold && !lunchClockedOut && earliestIn != null && latestOut != null) {
                     if (!earliestIn.isAfter(lunchStart) && latestOut.isAfter(lunchStop)) {
                         dailyMinutes -= lunchDuration;
+                        
+                        System.out.println("In: " + clockInTime);
+                        System.out.println("Out: " + clockOutTime);
+                        System.out.println("DailyMinutes: " + dailyMinutes);
                     }
                 }
 
                 totalMinutes += dailyMinutes;
+                System.out.println("Total Minutes: " + totalMinutes);
             }
 
             return totalMinutes;
@@ -174,11 +186,16 @@ public final class DAOUtility {
 
             int dailyMinutes = (int) schedule.getShiftduration() - (int) schedule.getLunchduration();
             scheduledMinutesToWork += dailyMinutes;
+//            System.out.println(dailyMinutes);
+//            System.out.println(scheduledMinutesToWork);
 
         }
 
         double resultPercentage = 100.0 * (scheduledMinutesToWork - totalMinutesWorked) / scheduledMinutesToWork;
 
+//        System.out.println("TotalMinutesWorked: " + totalMinutesWorked);
+//        System.out.println("ScheduledMinutesToWork: " + scheduledMinutesToWork);
+//        System.out.println("ResultPercentage: " + resultPercentage);
         return BigDecimal.valueOf(resultPercentage);
     }
 
