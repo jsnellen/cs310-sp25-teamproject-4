@@ -200,7 +200,7 @@ public final class DAOUtility {
     }
 
     /*
-    Author: Cole Stephens
+    Author: Cole Stephens Tanner Thomas
     Accepts a list of (already adjusted) Punch objects for an entire pay period, and a Shift object as arguments.
     This method should iterate through this list, copy the data for each punch into a nested data structure, encode 
     this structure as a JSON string, and return this string to the caller. 
