@@ -10,6 +10,8 @@ import edu.jsu.mcis.cs310.tas_sp25.Department;
 import edu.jsu.mcis.cs310.tas_sp25.Employee;
 import edu.jsu.mcis.cs310.tas_sp25.EventType;
 import edu.jsu.mcis.cs310.tas_sp25.Punch;
+import edu.jsu.mcis.cs310.tas_sp25.Shift;
+import edu.jsu.mcis.cs310.tas_sp25.dao.ReportDAO;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data Access Object (DAO) for managing absenteeism records in the database.
@@ -41,6 +44,7 @@ public class AbsenteeismDAO {
     private static final String Query_FIND = "SELECT * FROM absenteeism WHERE employeeid = ? AND payperiod = ?";
     private static final String Query_INSERT = "INSERT INTO absenteeism (employeeid, payperiod, percentage) VALUES (?,?,?)" 
                                                 + "ON DUPLICATE KEY UPDATE percentage = ?";
+    private static final String QUERY_CLEAR = "DELETE FROM absenteeism WHERE employeeid = ?";
     
     /**
          * Retrieves the absenteeism record for a given employee and pay period start date. 
@@ -147,6 +151,35 @@ public class AbsenteeismDAO {
             
         }
     }
+    
+    /**
+     * Clears all absenteeism records for a given employee from the database.
+     * 
+     * @param employeeId The ID of the employee whose absenteeism records should be cleared.
+     * @author Cole Stephens
+     */
+    public void clear(Integer employeeId) {
+        
+        PreparedStatement ps = null;
+        
+        try {
+            Connection conn = daoFactory.getConnection();
+            
+            if (conn.isValid(0)) {
+                
+                ps = conn.prepareStatement(QUERY_CLEAR);
+                ps.setInt(1, employeeId);
+                
+                int rowsAffected = ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (ps != null) {try {ps.close(); } catch (Exception e) {e.printStackTrace(); } }
+        }
+        
+    }
+   
 }
 
 
