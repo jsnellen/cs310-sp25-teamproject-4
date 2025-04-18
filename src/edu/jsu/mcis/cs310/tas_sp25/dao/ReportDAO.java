@@ -254,12 +254,29 @@ public class ReportDAO{
                     
                     Shift shift = shiftDAO.find(badge, date);
                     
-                   BigDecimal regularMinutes = BigDecimal.valueOf(DAOUtility.calculateTotalMinutes(punchList, shift));
+                    for (Punch punch : punchList){
+                        punch.adjust(shift);
+                    }
+                    
+                   BigDecimal workedMinutes = BigDecimal.valueOf(DAOUtility.calculateTotalMinutes(punchList, shift));
                    
-                   BigDecimal regularHours = regularMinutes.divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
-                   result.put("regular", regularHours);
+                   BigDecimal workedHours = workedMinutes.divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+                   
 
-                   result.put("department",rs.getString("departmentName"));
+                   BigDecimal regularHours = BigDecimal.valueOf((shift.getShiftDuration()/60)*5);
+                   
+                   BigDecimal overtimeHours = BigDecimal.valueOf(0);
+                   
+                    if (workedHours.compareTo(regularHours) > 0) {
+                        
+                        overtimeHours = workedHours.subtract(regularHours);
+                        
+                    }
+                    result.put("overtime", overtimeHours.toString());
+                    result.put("department",rs.getString("departmentName"));
+                    result.put("regular", regularHours.toString());
+                    result.put("lastname", rs.getString("lastName"));
+                    
                    resultArray.add(result);
                    
                    System.out.println(result);
