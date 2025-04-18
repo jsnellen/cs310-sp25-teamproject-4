@@ -67,6 +67,20 @@ public class ReportDAO{
             + "WHERE (? IS NULL OR employee.departmentid = ?) "
             + "ORDER BY employee.lastname, employee.firstname, event.timestamp DESC";
     
+    private static final String QUERY_EMPLOYEE_INFO = "SELECT employee.firstname, employee.middlename, employee.lastname, badge.id AS badgeid, "
+            + "department.description AS department "
+            + "FROM employee "
+            + "JOIN badge ON employee.badgeid = badge.id "
+            + "JOIN department ON employee.departmentid = department.id "
+            + "WHERE employee.id = ? ";
+    
+    private static final String QUERY_ABSENTEEISM_HISTORY = "SELECT payperiod, percentage "
+            + "FROM absenteeism "
+            + "WHERE employeeid = ? "
+            + "ORDER BY payperiod DESC "
+            + "LIMIT 12 ";
+
+    
     /**
      * Retrieves a summary of employee badge information for a specified department.
      * 
@@ -255,4 +269,89 @@ public class ReportDAO{
         return "Clock In".equals(eventType) ? "In" : "Out";
     }
     
+    public String getAbsenteeismHistory(Integer employeeId) {
+       
+       PreparedStatement psEmployee = null;
+       PreparedStatement psAbsenteeism = null;
+       ResultSet rsEmployee = null;
+       ResultSet rsAbsenteeism = null;
+       
+       JsonObject result = new JsonObject();
+       JsonArray historyArray = new JsonArray();
+       
+       BigDecimal lifetimeTotal = BigDecimal.ZERO;
+       int recordCount = 0;
+       
+       try {
+           Connection conn = daoFactory.getConnection();
+           
+           if (conn.isValid(0)) {
+               
+               psEmployee = conn.prepareStatement(QUERY_EMPLOYEE_INFO);
+               psEmployee.setInt(1, employeeId);
+               rsEmployee = psEmployee.executeQuery();
+               
+               if (rsEmployee.next()) {
+                   String firstname = rsEmployee.getString("firstname");
+                   String middlename = rsEmployee.getString("middlename");
+                   String lastname = rsEmployee.getString("lastname");
+                   
+                   if (middlename == null) middlename = "";
+                   
+                   String name = lastname + ", " + firstname + " " + middlename.trim();
+                   
+                   result.put("name", name.trim());
+                   result.put("badgeid", rsEmployee.getString("badgeid"));
+                   result.put("department", rsEmployee.getString("department"));
+               }
+               
+               psAbsenteeism = conn.prepareStatement(QUERY_ABSENTEEISM_HISTORY);
+               psAbsenteeism.setInt(1, employeeId);
+               rsAbsenteeism = psAbsenteeism.executeQuery();
+               
+               List<JsonObject> tempRecords = new ArrayList<>();
+               
+               while (rsAbsenteeism.next()) {
+                   LocalDate payPeriod = rsAbsenteeism.getDate("payperiod").toLocalDate();
+                   BigDecimal percentage = rsAbsenteeism.getBigDecimal("percentage").setScale(2, RoundingMode.HALF_UP);
+                   
+                   JsonObject record = new JsonObject();
+                   record.put("payperiod", payPeriod.toString());
+                   record.put("percentage", percentage.toString());
+                   
+                   tempRecords.add(record);
+               }
+               
+               Collections.reverse(tempRecords);
+               
+               for (JsonObject record : tempRecords) {
+                   
+                   BigDecimal percentage = new BigDecimal(record.get("percentage").toString());
+                   
+                   lifetimeTotal = lifetimeTotal.add(percentage);
+                   recordCount++;
+                   
+                   BigDecimal lifetimeAverage = lifetimeTotal.divide(new BigDecimal(recordCount), 2, RoundingMode.HALF_UP);
+                   
+                   record.put("lifetime", lifetimeAverage.toString());
+               }
+               
+               Collections.reverse(tempRecords);
+               
+               historyArray.addAll(tempRecords);
+               
+               result.put("absenteeismhistory", historyArray);
+           }
+       } catch (Exception e) {
+           e.printStackTrace();
+       } finally {
+           if (rsEmployee != null) { try {rsEmployee.close(); } catch (Exception e) { e.printStackTrace(); } }
+           if (psEmployee != null) { try {psEmployee.close(); } catch (Exception e) { e.printStackTrace(); } }
+           if (rsAbsenteeism != null) { try {rsAbsenteeism.close(); } catch (Exception e) { e.printStackTrace(); } }
+           if (psAbsenteeism != null) { try {psAbsenteeism.close(); } catch (Exception e) { e.printStackTrace(); } }
+       }
+       
+       return Jsoner.serialize(result);
+   } 
 }
+
