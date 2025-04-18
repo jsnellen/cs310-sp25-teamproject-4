@@ -1,13 +1,18 @@
 /**
  *
- *A punch records when an employee clocks in, clocks out, or times out at a terminal using their badge. 
- * 
- * <p>Each punch includes metadata such as the original and adjusted timestamp, 
- * event type (e.g., CLOCK_IN, CLOCK_OUT), terminal ID, and the type of time adjustment (e.g., rounded, grace period, docked).</p>
- * 
- * <p>Adjustment logic is applied based on the employee's shift and includes rules for rounding, grace period, 
- * dock penalties, and lunch time adjustments. It supports weekend rules and preserves both original and adjusted timestamps.</p>
- * 
+ *A punch records when an employee clocks in, clocks out, or times out at a terminal using their badge.
+ *
+ * <p>
+ * Each punch includes metadata such as the original and adjusted timestamp,
+ * event type (e.g., CLOCK_IN, CLOCK_OUT), terminal ID, and the type of time
+ * adjustment (e.g., rounded, grace period, docked).</p>
+ *
+ * <p>
+ * Adjustment logic is applied based on the employee's shift and includes rules
+ * for rounding, grace period, dock penalties, and lunch time adjustments. It
+ * supports weekend rules and preserves both original and adjusted
+ * timestamps.</p>
+ *
  * @author evanranjitkar
  * @author Tanner Thomas
  * @author mahin patel
@@ -31,15 +36,13 @@ public class Punch {
     private LocalDateTime adjustedTimeStamp;
     private PunchAdjustmentType adjustmentType;
 
-   
     /**
      * First Constructor for Punch class
-     * 
+     *
      * @param terminalId The terminalId used for the punch
      * @param badge The badge object for the Punch instance
      * @param eventType The type of event
      */
-    
     public Punch(int terminalId, Badge badge, EventType eventType) {
         this.terminalId = terminalId;
         this.badge = badge;
@@ -49,7 +52,7 @@ public class Punch {
 
     /**
      * Second Constructor for Punch class
-     * 
+     *
      * @param id the id used for the punch
      * @param terminalId The terminalId used for the punch
      * @param badge The badge object for the Punch instance
@@ -65,8 +68,7 @@ public class Punch {
     }
 
     // Getter Methods
-    
-     /**
+    /**
      * Returns the id
      *
      * @return id
@@ -129,12 +131,12 @@ public class Punch {
     public PunchAdjustmentType getAdjustmentType() {
         return this.adjustmentType;
     }
-    
+
     public LocalDateTime getOriginaltimestamp() {
         return originalTimeStamp;
     }
 
-     /**
+    /**
      * Adjusts the shift duration
      *
      * @param s The shift object for the punch instance
@@ -146,7 +148,7 @@ public class Punch {
         LocalDateTime adjusted = original;
         // Default adjustment is NONE
         PunchAdjustmentType adjustmentType = PunchAdjustmentType.NONE;
-        
+
         DayOfWeek day = original.getDayOfWeek();
         DailySchedule schedule = s.getDailySchedule(day);
 
@@ -161,12 +163,28 @@ public class Punch {
 
         // Converting timestamps to LocalTime
         LocalTime punchTime = original.toLocalTime();
-        
 
         // Skipping adjustments for Time out punches
         if (eventType == EventType.TIME_OUT) {
-            this.adjustedTimeStamp = original;
-            this.adjustmentType = PunchAdjustmentType.NONE;
+            int minute = original.getMinute();
+            int remainder = minute % roundInterval;
+            int adjustment = 0;
+
+            if (remainder != 0) {
+                if (remainder < roundInterval / 2) {
+                    adjustment = -remainder; // Round down to the nearest interval
+                } else {
+                    adjustment = roundInterval - remainder; // Round up to the next interval
+                }
+                adjusted = original.plusMinutes(adjustment).withSecond(0).withNano(0);
+                adjustmentType = PunchAdjustmentType.INTERVAL_ROUND;
+            } else {
+                adjusted = original.withSecond(0).withNano(0);
+                adjustmentType = PunchAdjustmentType.NONE;
+            }
+
+            this.adjustedTimeStamp = adjusted;
+            this.adjustmentType = adjustmentType;
             return;
         }
 
@@ -330,7 +348,6 @@ public class Punch {
     }
 
 // ANOTHER WAY TO DO - We can use adjustToNearestInterval()
-
 //    private LocalDateTime adjustToNearestInterval(LocalDateTime time, int interval) {
 //        // Remove seconds and nanoseconds
 //        time = time.withSecond(0).withNano(0); // Remove seconds/nanoseconds
@@ -351,5 +368,4 @@ public class Punch {
 //            }
 //        return time.plusMinutes(adjustment);
 //    }
-
 }
